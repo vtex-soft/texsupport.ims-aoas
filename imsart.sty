@@ -16,7 +16,6 @@
 %%   Bernoulli
 %%   Annales de l'Institut Henri Poincar\'e - Probabilit\'es et Statistiques
 %%   Brazilian Journal of Probability and Statistics
-%%   Stochastic Systems
 %%   Bayesian Analysis
 %%
 %%   Institute of Mathematical Statistics, U.S.A.
@@ -69,7 +68,7 @@
 % Requires Latex2e, ver.2000.06
 
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2020/01/20}
+\def\imsfmt@version{2020/04/06}
 
 \ProvidesFile{imsart.sty}
         [\imsfmt@version IMS article style (VS)]
@@ -312,13 +311,13 @@
 }
 
 \DeclareOption{aihp}{%
-   \def\journal@id{-aihp}
-   \def\journal@name{Submitted to the Annales de l'Institut Henri Poincar\'e - Probabilit\'es et Statistiques}
-   \def\journal@url{http://www.imstat.org/aihp}
-   \set@page@layout{39pc}{622pt}% 39pc * 52 line
-   \@twosidetrue
-   \@aihplayouttrue
-   \AtEndOfPackage{\let\affiliation\@gobble}
+    \def\journal@id{-aihp}
+    \def\journal@name{Submitted to the Annales de l'Institut Henri Poincar\'e - Probabilit\'es et Statistiques}
+    \def\journal@url{http://www.imstat.org/aihp}
+    \set@page@layout{169.475mm}{56pc}
+    \@twosidetrue
+    \@aihplayouttrue
+    \AtEndOfPackage{\let\affiliation\@gobble}
 }
 
 \DeclareOption{bjps}{%
@@ -331,33 +330,6 @@
    \@keywordsasfootnotetrue
    \@addressatendtrue
    \@bjpslayouttrue
-}
-
-\newif\if@ssylayout \@ssylayoutfalse
-\DeclareOption{ssy}{% todo: remove
-   \def\journal@id{-ssy}
-   \def\journal@name{Stochastic Systems }
-   \def\journal@url{http://www.i-journals.org/ssy/}
-   \def\copyrightowner@text{Institute of Mathematical Statistics}
-   \def\journal@issn{$\copyright$~\ims@href{http://www.imstat.org}{\copyrightowner@text}, \@copyrightyear}%
-   \set@page@layout{30pc}{550pt}% 30pc * 46 line
-   \@twosidetrue
-   \input{leqno.clo}% formula numbers at left
-   \@amsmath@leqnotrue
-   \@historyasfootnotetrue
-   \@keywordsasfootnotetrue
-   \@addressatendtrue
-   \@imslayouttrue
-   \@autosecdottrue
-   \@noundefthanksreftrue
-   \AtEndOfPackage{%
-      \setpkgattr{copyright}{text}{%
-         \url@fmt{}{\itshape}{\journal@name}{\journal@url}\break%
-         \@ifnonempty{\@pubyear\ \@volume\@issue\@pagerange\break}%
-         \doi@text\break%
-                                    }}
-   \AtBeginDocument{\def\thebibliography{\let\section\specialsection\old@thebibliography}}%
-   \@ssylayouttrue
 }
 
 %% Layouts:
@@ -526,11 +498,20 @@
     \fi
 \fi
 
+\if@aihplayout
+    \if@old@layout
+        \set@page@layout{39pc}{622pt}% 39pc * 52 line
+    \fi
+\fi
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% dimensions
 
 \setlength\parindent {12\p@}
 \setlength\headsep   {14\p@}
 \setlength\footskip  {14\p@}
+\if@aihplayout 
+    \setlength\footskip{24\p@}
+\fi
 
 \setlength\smallskipamount{6\p@ \@plus 1\p@ \@minus 1\p@}
 \setlength\medskipamount  {12\p@ \@plus 3\p@ \@minus 3\p@}
@@ -722,6 +703,7 @@
 
 % Isvedame zymes
 \DeclareRobustCommand{\thanksref}{\@ifnextchar[{\@tempswatrue\@thanksref}{\@tempswafalse\@thanksref[]}}
+\let\orig@thanksref\thanksref
 
 \def\@thanksref[#1]#2{%
   \if@tempswa% []
@@ -788,7 +770,6 @@
 \let\ead@size\relax
 \def\printead@fmt#1{#1}
 
-% for BJ journal:
 \newcounter{emailref}
 \setvaluelist{emailmarks}{*,**,\textdagger,\textdaggerdbl}
 \def\theemailref{\getitemvalue{emailmarks}{\the\c@emailref}}
@@ -799,16 +780,14 @@
 
 \if@old@layout
 \else
-    \if@imslayout
-        \setvaluelist{emailmarks}{*,\textdagger,\textdaggerdbl,%
-            \textsection,\textparagraph,||,**,\textdagger\textdagger,%
-            \textdaggerdbl\textdaggerdbl
-            }
-        \define@key{ead}{mark}[true]{%
-            \csxdef{ead@\ead@label @mark}{\the\c@author}%
-            \csxdef{author@\the\c@author @ead@mark}{\ead@label}%
-            }
-    \fi
+    \setvaluelist{emailmarks}{*,\textdagger,\textdaggerdbl,%
+        \textsection,\textparagraph,||,**,\textdagger\textdagger,%
+        \textdaggerdbl\textdaggerdbl
+        }
+    \define@key{ead}{mark}[true]{%
+        \csxdef{ead@\ead@label @mark}{\the\c@author}%
+        \csxdef{author@\the\c@author @ead@mark}{\ead@label}%
+        }
 \fi
 
 
@@ -909,6 +888,14 @@
             \fi
             \bgroup
                 \ead@size\def\null{}%
+                \@ifundefined{ead@\ead@ref @mark}%
+                    {}%
+                    {%
+                        \usethankscounter{emailref}%
+                        \thanksmark{\ead@ref}%
+                        \restorethankscounter
+                        \cslet{r@\ead@ref thanks}\relax
+                    }%
                 \ims@href{\ead@prefix\saferef{\ead@ref @\ead@type}}{\ims@href@text}%
             \egroup
             \@ifundefined{ead@text}%
@@ -917,24 +904,6 @@
             }%
         }%
     }}
-
-\if@old@layout
-\else
-    \if@imslayout
-        \gdef\printead@hook{%
-            \@ifundefined{ead@\ead@ref @mark}%
-                {}%
-                {%
-                    \usethankscounter{emailref}%
-                    \thanksmark{\ead@ref}%
-                    \restorethankscounter
-                    \cslet{r@\ead@ref thanks}\relax
-                }%
-            }
-    \fi
-\fi
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \copyrightowner, \corref
 
@@ -1576,25 +1545,36 @@
         \fi
         \def\fnms##1{{\fnms@size{##1}}}%
         \def\snm##1{\snm@size{##1}}%
+        \if@old@layout
+        \else
+            \def\thanksref##1{%
+                \edef\author@direct@thanksref{##1}%
+                \def\thanksref{\@latex@error{only one \string\thanksref\space is allowed inside \string\author}{??}}%
+                }%
+        \fi
         \noindent#2%
         \if@old@layout
             \thanksref{#1}%
         \else
-            \if@imslayout
-                \@ifundefined{author@\the\c@author @ead@mark}%
-                    {}%
-                    {\edef\ead@label@mark{\csname author@\the\c@author @ead@mark\endcsname}}%
-                \ifx.#1.%
-                    \@ifundefined{author@\the\c@author @ead@mark}%
-                        {}%
-                        {\thanksref{\ead@label@mark}}%
-                \else
-                    \@ifundefined{author@\the\c@author @ead@mark}%
-                        {\thanksref{#1}}%
-                        {\thanksref{#1,\ead@label@mark}}%
-                \fi
+            \ifx.#1.%
+                \let\tmp@author@thanksrefs\@empty%
+                \edef\tmp@sep{}%
             \else
-                \thanksref{#1}%
+                \appto\tmp@author@thanksrefs{#1}%
+                \edef\tmp@sep{,}%
+            \fi
+            \@ifundefined{author@direct@thanksref}%
+                {}%
+                {%
+                    \eappto\tmp@author@thanksrefs{\tmp@sep\tmp@author@direct@thanksref}%
+                    \edef\tmp@sep{,}%
+                }%
+            \@ifundefined{author@\the\c@author @ead@mark}%
+                {}%
+                {\eappto\tmp@author@thanksrefs{\tmp@sep\csname author@\the\c@author @ead@mark\endcsname}}%
+            \ifx\tmp@author@thanksrefs\@empty
+            \else
+                \expandafter\orig@thanksref\expandafter{\tmp@author@thanksrefs}%
             \fi
         \fi
     \egroup
@@ -2268,318 +2248,311 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set up parameters for the IMS journals (AOP, AAP, AOS) layout:
 \if@imslayout
-    \if@ssylayout
+    \RequirePackage[T1]{fontenc}
+    \RequirePackage{times}
+    \RequirePackage[scaled=.9]{helvet}
+    \RequirePackage{textcomp}
+    \def\@xipt{11}
+    \def\@xivpt{14}
+    \def\@xvipt{16}
+    \def\@xviiipt{18}
+    \def\@xxpt{20}
+    \def\@xxivpt{24}
+    \renewcommand\normalsize{%
+        \@setfontsize\normalsize\@xipt{13\p@ plus .5\p@ minus .5\p@}%
+        \abovedisplayskip 7\p@ \@plus3\p@ \@minus3\p@
+        \belowdisplayskip\abovedisplayskip
+        \abovedisplayshortskip\abovedisplayskip
+        \belowdisplayshortskip\abovedisplayskip
+        \let\@listi\@listI
+        }
+    \normalfont\normalsize
+    \renewcommand\small{%
+        \@setfontsize\small\@xpt{12pt plus .3pt minus .3pt}%
+        \abovedisplayskip 6\p@ \@plus2\p@ \@minus2\p@
+        \belowdisplayskip \abovedisplayskip
+        \abovedisplayshortskip\abovedisplayskip
+        \belowdisplayshortskip\abovedisplayskip
+        }
+    \renewcommand\footnotesize{%
+        \@setfontsize\small\@ixpt{11pt plus .2\p@ minus .2\p@}%
+        \abovedisplayskip 6\p@ \@plus2\p@ \@minus2\p@
+        \belowdisplayskip \abovedisplayskip
+        \abovedisplayshortskip\abovedisplayskip
+        \belowdisplayshortskip\abovedisplayskip
+        }
+    \renewcommand\scriptsize{\@setfontsize\scriptsize\@viiipt\@xpt}
+    \renewcommand\tiny{\@setfontsize\tiny\@vipt\@viipt}
+    \renewcommand\large{\@setfontsize\large\@xiipt{14}}
+    \renewcommand\Large{\@setfontsize\Large\@xivpt{16}}
+    \renewcommand\LARGE{\@setfontsize\LARGE\@xvipt{18}}
+    \renewcommand\huge{\@setfontsize\huge\@xviiipt{20}}
+    \renewcommand\Huge{\@setfontsize\Huge\@xxpt{24}}
+    % lists
+    \def\labelitemi  {\textbullet}
+    \def\labelitemii {\textendash}
+    \def\labelitemiii{\textasteriskcentered} 
+    \def\labelitemiv {{\footnotesize +}}
+    \def\labelenumi  {\theenumi.}
+    \def\labelenumii {\theenumii)}
+    \def\labelenumiii{\theenumiii.}
+    \def\labelenumiv {\theenumiv.}
+    \setlength\leftmargini{1em}
+    \setlength\leftmarginii{1em}
+    \setlength\leftmarginiii{1.02em}
+    \setlength\leftmarginiv{0.96em}
+    \setlength\labelsep{.5em}
+    \setlength  \labelwidth{\leftmargini}
+    \addtolength\labelwidth{-\labelsep}
+    \def\enumerate@listi{%
+        \labelwidth=.75em
+        \leftmargin=\labelwidth
+        \advance\leftmargin by \labelsep
+        }
+    \def\@listI{%
+        \leftmargin=\leftmargini
+        \listparindent=12\p@
+        \topsep=\smallskipamount
+        \csletcs{\@currenvir @list@addons}{\@currenvir @listi}%
+        \preto\@trivlist{%
+        \def\makelabel##1{{\hfill\normalfont ##1}}%
+        \csuse{\@currenvir @list@addons}}%
+        }
+    \def\enumerate@listii{%
+        \labelwidth=.777em
+        \leftmargin=\labelwidth
+        \advance\leftmargin by \labelsep
+        }
+    \if@old@layout
     \else
-        \RequirePackage[T1]{fontenc}
-        \RequirePackage{times}
-        \RequirePackage[scaled=.9]{helvet}
-        \RequirePackage{textcomp}
-        \def\@xipt{11}
-        \def\@xivpt{14}
-        \def\@xvipt{16}
-        \def\@xviiipt{18}
-        \def\@xxpt{20}
-        \def\@xxivpt{24}
-        \renewcommand\normalsize{%
-            \@setfontsize\normalsize\@xipt{13\p@ plus .5\p@ minus .5\p@}%
-            \abovedisplayskip 7\p@ \@plus3\p@ \@minus3\p@
-            \belowdisplayskip\abovedisplayskip
-            \abovedisplayshortskip\abovedisplayskip
-            \belowdisplayshortskip\abovedisplayskip
-            \let\@listi\@listI
-            }
-        \normalfont\normalsize
-        \renewcommand\small{%
-            \@setfontsize\small\@xpt{12pt plus .3pt minus .3pt}%
-            \abovedisplayskip 6\p@ \@plus2\p@ \@minus2\p@
-            \belowdisplayskip \abovedisplayskip
-            \abovedisplayshortskip\abovedisplayskip
-            \belowdisplayshortskip\abovedisplayskip
-            }
-        \renewcommand\footnotesize{%
-            \@setfontsize\small\@ixpt{11pt plus .2\p@ minus .2\p@}%
-            \abovedisplayskip 6\p@ \@plus2\p@ \@minus2\p@
-            \belowdisplayskip \abovedisplayskip
-            \abovedisplayshortskip\abovedisplayskip
-            \belowdisplayshortskip\abovedisplayskip
-            }
-        \renewcommand\scriptsize{\@setfontsize\scriptsize\@viiipt\@xpt}
-        \renewcommand\tiny{\@setfontsize\tiny\@vipt\@viipt}
-        \renewcommand\large{\@setfontsize\large\@xiipt{14}}
-        \renewcommand\Large{\@setfontsize\Large\@xivpt{16}}
-        \renewcommand\LARGE{\@setfontsize\LARGE\@xvipt{18}}
-        \renewcommand\huge{\@setfontsize\huge\@xviiipt{20}}
-        \renewcommand\Huge{\@setfontsize\Huge\@xxpt{24}}
-
-        % lists
-        \def\labelitemi  {\textbullet}
-        \def\labelitemii {\textendash}
-        \def\labelitemiii{\textasteriskcentered} 
-        \def\labelitemiv {{\footnotesize +}}
-        \def\labelenumi  {\theenumi.}
-        \def\labelenumii {\theenumii)}
-        \def\labelenumiii{\theenumiii.}
-        \def\labelenumiv {\theenumiv.}
-        \setlength\leftmargini{1em}
-        \setlength\leftmarginii{1em}
-        \setlength\leftmarginiii{1.02em}
-        \setlength\leftmarginiv{0.96em}
-        \setlength\labelsep{.5em}
-        \setlength  \labelwidth{\leftmargini}
-        \addtolength\labelwidth{-\labelsep}
-        \def\enumerate@listi{%
-            \labelwidth=.75em
+        \def\longlist@listii{%
             \leftmargin=\labelwidth
             \advance\leftmargin by \labelsep
             }
-        \def\@listI{%
-            \leftmargin=\leftmargini
-            \listparindent=12\p@
-            \topsep=\smallskipamount
-            \csletcs{\@currenvir @list@addons}{\@currenvir @listi}%
-            \preto\@trivlist{%
-                \def\makelabel##1{{\hfill\normalfont ##1}}%
-                \csuse{\@currenvir @list@addons}}%
-            }
-        \def\enumerate@listii{%
-            \labelwidth=.777em
-            \leftmargin=\labelwidth
-            \advance\leftmargin by \labelsep
-            }
-        \if@old@layout
-        \else
-            \def\longlist@listii{%
-                \leftmargin=\labelwidth
-                \advance\leftmargin by \labelsep
-                }
-        \fi
-        \def\@listii{%
-            \leftmargin=\leftmarginii
-            \listparindent=12\p@
-            \topsep=\z@
-            \csletcs{\@currenvir @list@addons}{\@currenvir @listii}%
-            \preto\@trivlist{%
-                \def\makelabel##1{{\hfill\normalfont ##1}}%
-                \csuse{\@currenvir @list@addons}}%
+    \fi
+    \def\@listii{%
+        \leftmargin=\leftmarginii
+        \listparindent=12\p@
+        \topsep=\z@
+        \csletcs{\@currenvir @list@addons}{\@currenvir @listii}%
+        \preto\@trivlist{%
+            \def\makelabel##1{{\hfill\normalfont ##1}}%
+            \csuse{\@currenvir @list@addons}%
             }%
-        \def\enumerate@listiii{%
-            \labelwidth=1.084em
+        }%
+    \def\enumerate@listiii{%
+        \labelwidth=1.084em
+        \leftmargin=\labelwidth
+        \advance\leftmargin by \labelsep
+        }
+    \if@old@layout
+    \else
+        \def\longlist@listiii{%
             \leftmargin=\labelwidth
             \advance\leftmargin by \labelsep
             }
-        \if@old@layout
-        \else
-            \def\longlist@listiii{%
-                \leftmargin=\labelwidth
-                \advance\leftmargin by \labelsep
-                }
-        \fi
-        \def\@listiii{%
-            \leftmargin=\leftmarginiii
-            \labelwidth=\leftmarginiii
-            \advance\labelwidth by -\labelsep
-            \listparindent=12\p@
-            \topsep=\z@
-            \csletcs{\@currenvir @list@addons}{\@currenvir @listiii}%
-            \preto\@trivlist{%
-                \def\makelabel##1{{\hfill\normalfont ##1}}%
-                \csuse{\@currenvir @list@addons}}%
-            }
-        \def\enumerate@listiv{%
-            \labelwidth=.917em
-            \leftmargin=\labelwidth
-            \advance\leftmargin by \labelsep
-            }
-        \def\@listiv{%
-            \leftmargin=\leftmarginiv
-            \labelwidth=\leftmarginiv
-            \advance\labelwidth by -\labelsep
-            \listparindent=12\p@
-            \topsep=\z@
-            \csletcs{\@currenvir @list@addons}{\@currenvir @listiv}%
-            \preto\@trivlist{%
-                \def\makelabel##1{{\hfill\normalfont ##1}}%
-                \csuse{\@currenvir @list@addons}}%
-            }
-        % longlist
-        \newcounter{longlist}
-        \def\thelonglist{\@roman\c@longlist}
-        \def\labellonglist{(\thelonglist)}
-        \def\longlist{\@ifnextchar[{\@longlist}{\@longlist[]}}
-        \def\@longlist[#1]{%
-            \list
-                {\labellonglist}%
-                {%
-                    \usecounter{longlist}%
-                    \ifx.#1.%
-                        \setcounter{longlist}{3}% 
-                        \settowidth\labelwidth{\labellonglist}%
-                        \setcounter{longlist}{0}%
-                    \else%
-                        \settowidth{\labelwidth}{#1}%
-                    \fi%
-                    \topsep=\smallskipamount
-                    \itemindent=\labelwidth
-                    \advance\itemindent by \labelsep
-                    \advance\itemindent by 1pc%
-                    \leftmargin=\z@
+    \fi
+    \def\@listiii{%
+        \leftmargin=\leftmarginiii
+        \labelwidth=\leftmarginiii
+        \advance\labelwidth by -\labelsep
+        \listparindent=12\p@
+        \topsep=\z@
+        \csletcs{\@currenvir @list@addons}{\@currenvir @listiii}%
+        \preto\@trivlist{%
+            \def\makelabel##1{{\hfill\normalfont ##1}}%
+            \csuse{\@currenvir @list@addons}}%
+        }
+    \def\enumerate@listiv{%
+        \labelwidth=.917em
+        \leftmargin=\labelwidth
+        \advance\leftmargin by \labelsep
+        }
+    \def\@listiv{%
+        \leftmargin=\leftmarginiv
+        \labelwidth=\leftmarginiv
+        \advance\labelwidth by -\labelsep
+        \listparindent=12\p@
+        \topsep=\z@
+        \csletcs{\@currenvir @list@addons}{\@currenvir @listiv}%
+        \preto\@trivlist{%
+            \def\makelabel##1{{\hfill\normalfont ##1}}%
+            \csuse{\@currenvir @list@addons}%
+            }%
+        }
+    % longlist
+    \newcounter{longlist}
+    \def\thelonglist{\@roman\c@longlist}
+    \def\labellonglist{(\thelonglist)}
+    \def\longlist{\@ifnextchar[{\@longlist}{\@longlist[]}}
+    \def\@longlist[#1]{%
+        \list
+            {\labellonglist}%
+            {%
+                \usecounter{longlist}%
+                \ifx.#1.%
+                    \setcounter{longlist}{3}% 
+                    \settowidth\labelwidth{\labellonglist}%
+                    \setcounter{longlist}{0}%
+                \else
+                    \settowidth{\labelwidth}{#1}%
+                \fi
+                \topsep=\smallskipamount
+                \itemindent=\labelwidth
+                \advance\itemindent by \labelsep
+                \advance\itemindent by 1pc%
+                \leftmargin=\z@
+            }%
+        }
+    \let\endlonglist =\endlist
+    %
+    \setlength\topskip {10\p@}
+    \setlength\maxdepth{.5\topskip}
+    %
+    \setlength\smallskipamount{6.5\p@ \@plus 1\p@ \@minus 1\p@}
+    \setlength\medskipamount  {13\p@ \@plus 3\p@ \@minus 3\p@}
+    \setlength\bigskipamount  {19.5\p@ \@plus 3\p@ \@minus 3\p@}
+    % PAGE-BREAKING PENALTIES
+    \clubpenalty=10000
+    \widowpenalty=10000
+    \tolerance=800
+    \hbadness=800
+    \emergencystretch=3\p@
+    \hfuzz=1pt
+    \AtBeginDocument{\interdisplaylinepenalty=100}
+    %
+    \arraycolsep=1.2\p@
+    \setlength\tabbingsep{6\p@}
+    \jot=6\p@ 
+    \@ifundefined{mathindent}%
+        {\newskip\mathindent}%
+        {}
+    \mathindent=2pc
+    \AtBeginDocument{%
+        \@ifundefined{@mathmargin}%
+            {}%
+            {\@mathmargin=\mathindent}%
+        }
+    \setlength\thinmuskip  {2.5mu}
+    \setlength\medmuskip   {3.5mu plus 1.5mu minus 2mu}
+    \setlength\thickmuskip {3.75mu plus 1.5mu}
+    \setlength\mathsurround{0.1\p@}
+    %    
+    \setlength{\parskip}{\z@}
+    %
+    \if@old@layout
+        \setlength\marginparsep  {10\p@}
+        \setlength\marginparwidth{59\p@}
+    \else
+        \setlength\marginparsep  {25\p@}
+        \setlength\marginparwidth{120\p@}
+    \fi
+    %
+    \def\frenchspacing{\sfcode`\.1006\sfcode`\?1005\sfcode`\!1004%
+        \sfcode`\:1003\sfcode`\;1002\sfcode`\,1001 }
+    %
+    \AtEndOfPackage{%
+        \appto\set@natbib{%
+            \let\save@NAT@bibsetnum\NAT@bibsetnum
+            \def\bibsection{\specialsection*{\refname}}%
+            \setlength\bibsep{\z@ \@plus .5\p@ \@minus .5\p@}%
+            \setlength\bibindent{20\p@}%
+            \preto\bibitem@fin{%
+                \clubpenalty=\@M
+                \widowpenalty=\@M
                 }%
-            }
-        \let\endlonglist =\endlist
-
-        \setlength\topskip {10\p@}
-        \setlength\maxdepth{.5\topskip}
-
-        \setlength\smallskipamount{6.5\p@ \@plus 1\p@ \@minus 1\p@}
-        \setlength\medskipamount  {13\p@ \@plus 3\p@ \@minus 3\p@}
-        \setlength\bigskipamount  {19.5\p@ \@plus 3\p@ \@minus 3\p@}
-
-        % PAGE-BREAKING PENALTIES
-        \clubpenalty=10000
-        \widowpenalty=10000
-        \tolerance=800
-        \hbadness=800
-        \emergencystretch=3\p@
-        \hfuzz=1pt
-        \AtBeginDocument{\interdisplaylinepenalty=100}
-
-        \arraycolsep=1.2\p@
-        \setlength\tabbingsep{6\p@}
-        \jot=6\p@ 
-        \@ifundefined{mathindent}%
-            {\newskip\mathindent}%
-            {}
-        \mathindent=2pc
-        \AtBeginDocument{%
-            \@ifundefined{@mathmargin}%
-                {}%
-                {\@mathmargin=\mathindent}%
-            }
-        \setlength\thinmuskip  {2.5mu}
-        \setlength\medmuskip   {3.5mu plus 1.5mu minus 2mu}
-        \setlength\thickmuskip {3.75mu plus 1.5mu}
-        \setlength\mathsurround{0.1\p@}
-        
-        \setlength{\parskip}{\z@}
-
-        \if@old@layout
-            \setlength\marginparsep  {10\p@}
-            \setlength\marginparwidth{59\p@}
-        \else
-            \setlength\marginparsep  {25\p@}
-            \setlength\marginparwidth{120\p@}
-        \fi
-
-        \def\frenchspacing{\sfcode`\.1006\sfcode`\?1005\sfcode`\!1004%
-            \sfcode`\:1003\sfcode`\;1002\sfcode`\,1001 }
-
-        \AtEndOfPackage{%
-            \appto\set@natbib{%
-                \let\save@NAT@bibsetnum\NAT@bibsetnum
-                \def\bibsection{\specialsection*{\refname}}%
-                \setlength\bibsep{\z@ \@plus .5\p@ \@minus .5\p@}%
-                \setlength\bibindent{20\p@}%
-                \preto\bibitem@fin{%
-                    \clubpenalty=\@M
-                    \widowpenalty=\@M
-                    }%
-                \def\NAT@bibsetnum{%
-                    \labelsep=5\p@
-                    \NAT@openbibtrue
-                    \topsep=\z@
-                    \save@NAT@bibsetnum}%
-                }
-            }
+            \def\NAT@bibsetnum{%
+                \labelsep=5\p@
+                \NAT@openbibtrue
+                \topsep=\z@
+                \save@NAT@bibsetnum
+                }%
+            }%
+        }
+    \setpkgattr{title}       {skip} {12\p@}
+    \setpkgattr{abstractname}{skip} {}
+    \setpkgattr{frontmatter} {cmd}  {\vskip20\p@ plus 3\p@ minus 3\p@}
+    %
+    \setpkgattr{abstract} {width}  {23pc}
+    \setpkgattr{abstract} {indent} {16pt} %2em
+    %
+    \setpkgattr{title}      {size} {\normalsize\bfseries\mathversion{bold}\spaceskip.5em}
+    \setpkgattr{author}     {size} {\normalsize\scshape}
+    \setpkgattr{affiliation}{size} {\normalsize\itshape}
+    \if@old@layout
+        \setpkgattr{address}    {size} {\scriptsize\scshape}
+        \setpkgattr{ead}        {size} {\upshape}
+        \setpkgattr{email}      {text} {E-mail: }
+    \else
+        \setpkgattr{abstract}   {skip} {14\p@}
+        \setpkgattr{address}    {skip} {8\p@}
+        \setpkgattr{address}    {size} {\scriptsize\itshape}
+        \setpkgattr{ead}        {size} {}
+        \setpkgattr{ead}        {sep}  {; }
+        \setpkgattr{email}      {text} {}
+        \setcounter{secnumdepth}{5}
+        \setcounter{tocdepth}{6}
     \fi
-  \setpkgattr{title}       {skip} {12\p@}
-  \setpkgattr{abstractname}{skip} {}
-  \setpkgattr{frontmatter} {cmd}  {\vskip20\p@ plus 3\p@ minus 3\p@}
-
-  \setpkgattr{abstract} {width}  {23pc}
-  \setpkgattr{abstract} {indent} {16pt} %2em
-
-  \setpkgattr{title}      {size} {\normalsize\bfseries\mathversion{bold}\spaceskip.5em}
-  \setpkgattr{author}     {size} {\normalsize\scshape}
-  \setpkgattr{affiliation}{size} {\normalsize\itshape}
-  \if@old@layout
-    \setpkgattr{address}    {size} {\scriptsize\scshape}
-    \setpkgattr{ead}        {size} {\upshape}
-    \setpkgattr{email}      {text} {E-mail: }
-  \else
-    \setpkgattr{abstract}   {skip} {14\p@}
-    \setpkgattr{address}    {skip} {8\p@}
-    \setpkgattr{address}    {size} {\scriptsize\itshape}
-    \setpkgattr{ead}        {size} {}
-    \setpkgattr{ead}        {sep}  {; }
-    \setpkgattr{email}      {text} {}
-    \setcounter{secnumdepth}{5}
-    \setcounter{tocdepth}{6}
-  \fi
-  \setpkgattr{abstractname}{size}{\itshape}
-  \setpkgattr{keywordname}{size} {\itshape}
-  \setpkgattr{runninghead}{size} {\footnotesize}
-  \setpkgattr{pagenumber} {size} {\small}
-  \setpkgattr{copyright}  {size} {\fontsize{6}{7}\selectfont\raggedright}
-  \setpkgattr{thebibliography}{size}{\footnotesize}
-
-  \setpkgattr{dochead}    {case} {\MakeUppercase}
-  \setpkgattr{title}      {case} {\MakeUppercase}
-  \setpkgattr{runninghead}{case} {\MakeUppercase}
-
-  \setpkgattr{author}   {prefix} {By~}
-
-  \setpkgattr{copyright}  {text} {\url@fmt{}{\itshape}{\journal@name}{\journal@url}\break%
-                                    \@ifnonempty{\@copyrightyear\@volume\@issue\@pagerange\break}%
-                                    \doi@text}
-
-  \setpkgattr{url}        {text} {URL: }
-  \setpkgattr{fullurl}    {text} {URL: }
-  \def\volume#1{\gdef\@volume{Vol. #1, }}
-  \def\issue#1{\gdef\@issue{No. #1, }}
-  \def\pubyear#1{\gdef\@pubyear{#1,}\gdef\@copyrightyear{#1 }}
-
-  \def\abstractname{}
-
-  \def\put@fmt@data{%
-    \copyright@fmt%
-    \history@fmt
-    \@thanks%
-    \keyword@fmt%
-    \abstract@fmt%
-    }
-
-  \def\contentsname@cmd{\specialsection*{\contentsname}}
-
-    % iki cia: viskas, kas turi neliesti ssy layout, turi eiti po siuo if'u
-
-  \if@ssylayout
-  \else
-
-        \setlength\footnotesep   {7\p@}
-        \setlength{\skip\footins}{18\p@ \@plus 4\p@ \@minus 2\p@}
-        \skip\@mpfootins = \skip\footins
-
-        \setlength\floatsep       {18\p@ \@plus 6\p@ \@minus 2\p@}
-        \setlength\textfloatsep   {18\p@ \@plus 6\p@ \@minus 2\p@}
-        \setlength\intextsep      {18\p@ \@plus 6\p@ \@minus 2\p@}
-        \setlength\dblfloatsep    {18\p@ \@plus 6\p@ \@minus 2\p@}
-        \setlength\dbltextfloatsep{24\p@ \@plus 6\p@ \@minus 2\p@}
-
-        \setlength\@fpsep   {8\p@ \@plus 1000fil}
-        \setlength\@dblfpsep{8\p@ \@plus 1000fil}
-
-        %  Float counters:
-        \setcounter{topnumber}{5}
-        \renewcommand\topfraction{.99}
-        \setcounter{bottomnumber}{5}
-        \renewcommand\bottomfraction{.99}
-        \setcounter{totalnumber}{10}
-        \renewcommand\textfraction{.05}
-        \renewcommand\floatpagefraction{.9}
-        \setcounter{dbltopnumber}{5}
-        \renewcommand\dbltopfraction{.99}
-        \renewcommand\dblfloatpagefraction{.8}
-    \fi
+    \setpkgattr{abstractname}{size}{\itshape}
+    \setpkgattr{keywordname}{size} {\itshape}
+    \setpkgattr{runninghead}{size} {\footnotesize}
+    \setpkgattr{pagenumber} {size} {\small}
+    \setpkgattr{copyright}  {size} {\fontsize{6}{7}\selectfont\raggedright}
+    \setpkgattr{thebibliography}{size}{\footnotesize}
+    %
+    \setpkgattr{dochead}    {case} {\MakeUppercase}
+    \setpkgattr{title}      {case} {\MakeUppercase}
+    \setpkgattr{runninghead}{case} {\MakeUppercase}
+    %
+    \setpkgattr{author}   {prefix} {By~}
+    %
+    \setpkgattr{copyright}{text}{%
+        \url@fmt{}{\itshape}{\journal@name}{\journal@url}\break
+        \@ifnonempty{\@copyrightyear\@volume\@issue\@pagerange\break}\doi@text
+        }
+    %
+    \setpkgattr{url}        {text} {URL: }
+    \setpkgattr{fullurl}    {text} {URL: }
+    \def\volume#1{\gdef\@volume{Vol. #1, }}
+    \def\issue#1{\gdef\@issue{No. #1, }}
+    \def\pubyear#1{\gdef\@pubyear{#1,}\gdef\@copyrightyear{#1 }}
+    %
+    \def\abstractname{}
+    %
+    \def\put@fmt@data{%
+        \copyright@fmt
+        \history@fmt
+        \@thanks
+        \keyword@fmt
+        \abstract@fmt
+        }
+    %
+    \def\contentsname@cmd{\specialsection*{\contentsname}}
+    %
+    \setlength\footnotesep   {7\p@}
+    \setlength{\skip\footins}{18\p@ \@plus 4\p@ \@minus 2\p@}
+    \skip\@mpfootins = \skip\footins
+    %
+    \setlength\floatsep       {18\p@ \@plus 6\p@ \@minus 2\p@}
+    \setlength\textfloatsep   {18\p@ \@plus 6\p@ \@minus 2\p@}
+    \setlength\intextsep      {18\p@ \@plus 6\p@ \@minus 2\p@}
+    \setlength\dblfloatsep    {18\p@ \@plus 6\p@ \@minus 2\p@}
+    \setlength\dbltextfloatsep{24\p@ \@plus 6\p@ \@minus 2\p@}
+    %
+    \setlength\@fpsep   {8\p@ \@plus 1000fil}
+    \setlength\@dblfpsep{8\p@ \@plus 1000fil}
+    %
+    %  Float counters:
+    \setcounter{topnumber}{5}
+    \renewcommand\topfraction{.99}
+    \setcounter{bottomnumber}{5}
+    \renewcommand\bottomfraction{.99}
+    \setcounter{totalnumber}{10}
+    \renewcommand\textfraction{.05}
+    \renewcommand\floatpagefraction{.9}
+    \setcounter{dbltopnumber}{5}
+    \renewcommand\dbltopfraction{.99}
+    \renewcommand\dblfloatpagefraction{.8}
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set up parameters for the STS journal layout:
@@ -2741,48 +2714,151 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set up parameters for the AIHP journal layout:
 
 \if@aihplayout
+    %
+    \def\@xipt{11}
+    \def\@xivpt{14}
+    \def\@xvipt{16}
+    \def\@xviiipt{18}
+    \def\@xxpt{20}
+    \def\@xxivpt{24}
+    %
+    \renewcommand\normalsize{%
+        \@setfontsize\normalsize\@xpt{12\p@ \@plus .3\p@ \@minus .3\p@}%
+        \abovedisplayskip=10\p@ \@plus 2\p@ \@minus2\p@
+        \abovedisplayshortskip=6\p@ \@plus 2\p@
+        \belowdisplayshortskip=6\p@ \@plus 2\p@
+        \belowdisplayskip=\abovedisplayskip
+        \let\@listi\@listI
+        }
+    \renewcommand\small{%
+        \@setfontsize\small\@ixpt{11\p@ \@plus .2\p@ \@minus .2\p@}%
+        \abovedisplayskip=7.5\p@ \@plus 4\p@ \@minus 1\p@
+        \belowdisplayskip=\abovedisplayskip
+        \abovedisplayshortskip=\abovedisplayskip
+        \belowdisplayshortskip=\abovedisplayskip
+        }
+    \renewcommand\footnotesize{%
+        \@setfontsize\footnotesize\@viiipt{10\p@ \@plus .1\p@ \@minus .1\p@}%
+        \abovedisplayskip=6\p@ \@plus 4\p@ \@minus 1\p@
+        \belowdisplayskip=\abovedisplayskip
+        \abovedisplayshortskip=\abovedisplayskip
+        \belowdisplayshortskip=\abovedisplayskip
+        }
+    \renewcommand\Large{\@setfontsize\Large\@xivpt{16}}
+    \renewcommand\LARGE{\@setfontsize\LARGE\@xvipt{18}}
+    \renewcommand\huge{\@setfontsize\huge\@xviiipt{20}}
+    \renewcommand\Huge{\@setfontsize\Huge\@xxpt{24}}
+    %
+    \RequirePackage[T1]{fontenc}
+    \RequirePackage{times}
+    \RequirePackage[scaled=.9]{helvet}
+    \RequirePackage{textcomp}
 
-  % FRONT MATTER SKIPS
-  \setpkgattr{title}       {skip} {64\p@}
-  \setpkgattr{authors}     {skip} {14\p@}
-  \setpkgattr{address}     {skip} {12\p@}
-  \setpkgattr{abstractname}{skip} {.\enskip}
-  \setpkgattr{history}     {skip} {4\p@}
-  \setpkgattr{abstract}    {skip} {16\p@}
-
-  \setpkgattr{fline}       {cmd}  {\vskip22\p@
-                                     \hrule}
-  \setpkgattr{lline}       {cmd}  {\vskip10\p@
-                                     \hrule}
-
-  % FRONT MATTER DIMENSIONS
-  \setpkgattr{abstract}   {width} {\textwidth}
-  \setpkgattr{abstract}  {indent} {\z@} 
-  \setpkgattr{keyword}    {width} {\textwidth}
-  \setpkgattr{keyword}   {indent} {\z@} %
-
-  % FRONT MATTER FONTS 
-  \setpkgattr{title}      {size} {\huge}
-  \setpkgattr{author}     {size} {\Large}
-  \setpkgattr{abstract}   {size} {\small\upshape}
-  \setpkgattr{keywordname}{size} {\itshape}
-  \setpkgattr{thebibliography}{size}{\footnotesize}
-
-  \def\put@fmt@data{%
-    \copyright@fmt%
-    \@thanks%
-    \history@fmt
-    \fline@cmd%
-    \abstract@fmt%
-    \keyword@fmt%
-    \lline@cmd%
-    \tableofcontents@fmt}
-
-  \setpkgattr{keyword}{KWD}{Keywords:}
-  \setpkgattr{email}{text}{E-mail: }
-
-  \def\theaddressref{\alph{addressref}}
-  
+    % FRONT MATTER SKIPS
+    \setpkgattr{title}       {skip} {64\p@}
+    \setpkgattr{authors}     {skip} {14\p@}
+    \if@old@layout
+        \setpkgattr{address}{skip}{12\p@}
+    \else
+        \setpkgattr{address}{skip}{12\p@\def\address@skip{0pt}}
+    \fi
+    \setpkgattr{abstractname}{skip} {.\enskip}
+    \setpkgattr{history}     {skip} {4\p@}
+    \setpkgattr{abstract}    {skip} {16\p@}
+    %
+    \setpkgattr{fline}       {cmd}  {\vskip22\p@ \hrule}
+    \setpkgattr{lline}       {cmd}  {\vskip10\p@ \hrule}
+    %
+    % FRONT MATTER DIMENSIONS
+    \setpkgattr{abstract}   {width} {\textwidth}
+    \setpkgattr{abstract}  {indent} {\z@} 
+    \setpkgattr{keyword}    {width} {\textwidth}
+    \setpkgattr{keyword}   {indent} {\z@} %
+    %
+    % FRONT MATTER FONTS 
+    \setpkgattr{title}      {size} {\huge}
+    \setpkgattr{author}     {size} {\Large}
+    \setpkgattr{abstract}   {size} {\small\upshape}
+    \setpkgattr{keywordname}{size} {\itshape}
+    \setpkgattr{thebibliography}{size}{\footnotesize}
+    \setcounter{tocdepth}{6}
+    %
+    \def\put@fmt@data{%
+        \copyright@fmt
+        \@thanks
+        \history@fmt
+        \fline@cmd
+        \abstract@fmt
+        \keyword@fmt
+        \lline@cmd
+        \tableofcontents@fmt
+        }
+    %
+    \setpkgattr{keyword}{KWD}{Keywords:}
+    \setpkgattr{keyword}{MSC}{MSC:}
+    \setpkgattr{keyword}{MSC2010}{MSC:}
+    \setpkgattr{keyword}{postfix}{\unskip}
+    \setpkgattr{email}{text}{E-mail: }
+    %
+    \def\theaddressref{\alph{addressref}}
+    %
+    \def\labelitemii {\textendash}
+    \def\labelitemiv {{\footnotesize +}}
+    %
+    \arraycolsep=1.2\p@
+    \setlength\tabbingsep{6\p@}
+    \jot=6\p@ 
+    \@ifundefined{mathindent}%
+        {\newskip\mathindent}%
+        {}
+    \mathindent=2pc
+    \AtBeginDocument{%
+        \mathindent=2pc
+        \@ifundefined{@mathmargin}%
+            {}%
+            {\@mathmargin=\mathindent}%
+        }
+    \setlength\medmuskip{3.5mu plus 1.5mu minus 2mu}
+    \setlength\thickmuskip {3.75mu plus 1.5mu}
+    \setlength\thinmuskip  {2.5mu}
+    \setlength\mathsurround{0.1\p@}
+    \columnsep=12\p@
+    \setlength\footnotesep   {7\p@}
+    \setlength{\skip\footins}{18\p@ \@plus 4\p@ \@minus 2\p@}
+    \skip\@mpfootins = \skip\footins
+    \setlength{\parskip}{\z@}
+    \setlength\marginparsep  {25\p@}
+    \setlength\marginparwidth{120\p@}
+    % 
+    % Float counters
+    \setlength\dblfloatsep{18\p@ \@plus 6\p@ \@minus 2\p@}
+    \setlength\dbltextfloatsep{24\p@ \@plus 6\p@ \@minus 2\p@}
+    \setlength\floatsep{18\p@ \@plus 6\p@ \@minus 2\p@}
+    \setlength\intextsep{18\p@ \@plus 6\p@ \@minus 2\p@}
+    \setlength\textfloatsep   {18\p@ \@plus 6\p@ \@minus 2\p@}
+    \setlength\@fpsep   {8\p@ \@plus 1000fil}
+    \setlength\@dblfpsep{8\p@ \@plus 1000fil}
+    \setcounter{bottomnumber}{5}
+    \setcounter{dbltopnumber}{5}
+    \setcounter{topnumber}{5}
+    \setcounter{totalnumber}{10}
+    \renewcommand\bottomfraction{.99}
+    \renewcommand\dbltopfraction{.99}
+    \renewcommand\dblfloatpagefraction{.8}
+    \renewcommand\floatpagefraction{.9}
+    \renewcommand\textfraction{.05}
+    \renewcommand\topfraction{.99}
+    %
+    % PAGE-BREAKING PENALTIES
+    \clubpenalty=10000
+    \widowpenalty=10000
+    \emergencystretch=3\p@
+    \hbadness=800
+    \tolerance=800
+    \AtBeginDocument{\interdisplaylinepenalty=100}
+    %
+    \def\frenchspacing{\sfcode`\.1006\sfcode`\?1005\sfcode`\!1004%
+        \sfcode`\:1003\sfcode`\;1002\sfcode`\,1001 }
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set up parameters for the BJPS journal layout:
@@ -3836,79 +3912,4 @@
 
 \endinput
 %%
-%% History:
-2016.11.14 - \qq{} protected
-2014.10.16 - added \qq{} 
-2014.10.13 - added \OrigBibText and \endOrigBibText 
-2014.07.30 - removed \raggedright from \relateddois 
-2014.07.23 - added \relateddoi and \relateddois
-2014.02.20 - "Submitted to the Bernoulli" changed to "Submitted to Bernoulli"; 
-2014.01.08 - "Submitted to the Statistical Science" changed to "Submitted to Statistical Science"; 
-2013.05.28 - keyword key MSC added (MSC 2010 subject classifications:);
-2013.03.06 - added \bpublisher for the \bmanual entry;
-2012.08.31 - bug fix in stslayout;
-2012.08.16 - added new bibliography commands;
-2012.04.10 - bug fix in stslayout;
-2010.03.13 - new option linksfromyear (makes a hyperlink only from year component of the cite command);
-2012.02.28 - SSY - references layout changed;
-2012.02.07 - new option noundefthanksref (SSY journal);
-2011.12.06 - empty command \sfilename added;
-2011.12.01 - when \title is centered, \\ is defined as \break;
-2011.11.28 - bugfix in \title command;
-           - \thanksref made robust;
-2011.11.15 - small fixes related to the webbib tagging;
-2011.11.15 - minor change: bug fix when contructing keywords list for pdf's metadata;
-2011.05.20 - SS journal url changed;
-2011.03.02 - SSY copyright fixed;
-2011.01.24 - \bdoi added;
-2010.09.07 - journal url changed for EJS journal;
-2010.08.03 - \tableofcontents fixed for the imslayout journals;
-2010.04.27 - support for the "Stochastic Systems" (ssy) added;
-2009.12.16 - \betal added
-2009.08.13 - support for the structured bibliography added (imsart-number.bst,imsart-nameyear.bst)
-             options [numbers,sort&compress] from natbib package removed
-2009.05.21 - added new option "bjps"
-2009.02.27 - all hyperref links are set to "blue"
-           - smart \MR command (code suggested by Vilmos Prokaj <prokaj@cs.elte.hu>
-2008.08.29 - supplement environment added
-2008.01.24 - for "coll" changed journal url
-2008.01.09 - added new option "coll"
-2007.12.10 - added new option "aihp"
-           - abstract have an attribute language=
-           - multiple abstracts
-           - \atltitle{} - title in another language
-2007.09.18 - fixed small error in SS (affiliation)
-2007.04.13 - fixed small error in EJS
-2007.04.02 - ISSN numbers of EJS and SS included
-2007.02.20 - support for the "Electronic Journal of Statistics" (ejs) added;
-2007.01.24 - support for the "The Annals of Applied Statistics" (aoas) and Bernoulli (bj) added;
-2006.10.13 - small bug with "lnms, ps, ss" options fixed;
-2006.09.07 - if no options specified, imsart.sty is loaded with "generic" option;
-           - new options: imslayout, stslayout
-2006.08.23 -"author's addresses" secion added to bookmarks (aap,aop,aos);
-           -completely new STS layout;
-           -\tableofcontents adjusted, could be used in frontmatter part;
-           -support for LNMS Table of Contents;
-           -support for LNMS "List of Contributors" (\contributor{Author, F.}{University});
-           -command \arxiv{math.PR/0000000} introduced to provide link to article location in arXiv
-           -\@journal{} changed to \journal@name
-           -\ead{} correctly sets the pdf link when "http://" prefix is used;
-           -\ead[...,nopdflink]{} supresses pdf link;
-           -a lot of internal changes;
-           - fix of a bug with newer hyperref versions (\orig@footnotetext)
-           -equation numbers are at left for LNMS layout;
-
-2006.03.07 -command \volumename{} introduced + small changes for LNMS option
-           (addresses will be positioned on title page)
-           -pdf document properties could be changed with commands
-            \pdftitle{}, \pdfsubject{}, \pdfauthor{}
-
-2006.01.04 support for the "Statistics Surveys" (ss) added;
-
-2005.10.19 fix of a bug with bibliography and ims layout
-           \@footnotetext is changed due to the arXiv hyperref setup
-
-2005.05.19 New options singlespacing, doublespacing, linenumbers, nolinenumbers introduced;
-           Table and figure captions changed
-
 %% End of file `imsart.sty'.

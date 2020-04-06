@@ -16,7 +16,6 @@
 %%   Bernoulli
 %%   Annales de l'Institut Henri Poincar\'e - Probabilit\'es et Statistiques
 %%   Brazilian Journal of Probability and Statistics
-%%   Stochastic Systems
 %%   Bayesian Analysis
 %%
 %%   Institute of Mathematical Statistics, U.S.A.
@@ -63,13 +62,13 @@
 %%
 %% Bug fixes and changes: at end of file
 
-% TeX programming: Vytas Statulevicius, VTeX, Lithuania,
-% TeX programming: Deimantas Galcius, VTeX, Lithuania,
+% TeX programming: Vytas Statulevicius, VTeX, Lithuania.
+% TeX programming: Deimantas Galcius, VTeX, Lithuania.
+% TeX programming: Edgaras Sakuras, VTeX, Lithuania.
 % Requires Latex2e, ver.2000.06
 
-
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{imsart}[2010/04/27 driver class for package imsart.sty]
+\ProvidesClass{imsart}[2020/04/06 driver class for package imsart.sty]
 
 % layout options:
 
@@ -81,12 +80,10 @@
   \PassOptionsToClass{11pt,oneside,leqno}{article}
   \PassOptionsToPackage{leqno}{amsmath}}
 
-
 % set various options for different journals:
 \DeclareOption{generic}{%
   \PassOptionsToClass{10pt,oneside}{article}
 }
-
 
 \DeclareOption{ps}{%
   \PassOptionsToClass{10pt,oneside}{article}
@@ -110,7 +107,6 @@
   \PassOptionsToPackage{leqno}{amsmath}
 }
 
-
 \DeclareOption{aap}{%
   \PassOptionsToClass{11pt,oneside,leqno}{article}
   \PassOptionsToPackage{leqno}{amsmath}
@@ -131,7 +127,6 @@
   \PassOptionsToPackage{leqno}{amsmath}
 }
 
-
 \DeclareOption{sts}{%
   \PassOptionsToClass{11pt,oneside,leqno}{article}
   \PassOptionsToPackage{leqno}{amsmath}
@@ -147,14 +142,8 @@
   \PassOptionsToPackage{numbers,sort&compress}{natbib}
 }
 
-
 \DeclareOption{bjps}{
   \PassOptionsToClass{11pt,twoside}{article}
-}
-
-\DeclareOption{ssy}{%
-  \PassOptionsToClass{11pt,oneside,leqno}{article}
-  \PassOptionsToPackage{leqno}{amsmath}
 }
 
 \DeclareOption{ba}{%
@@ -184,11 +173,4 @@ File could be downloaded from http://www.e-publications.org/ims/support
 
 \endinput
 %%
-%% History:
-%% 2010.04.27 - support for the "Stochastic Systems" (ssy) added;
-%% 2009.08.13 - options [numbers,sort&compress] from natbib package removed
-%% 2009.05.21 - added new option "bjps"
-%% 2008.01.09 - added new option "coll"
-%% 2007.12.10 - added new option "aihp"
-%% 2007.08.22 - aoas: default value for natbib set to authoryear 
 %% End of file `imsart.cls'.
