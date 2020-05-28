@@ -68,7 +68,7 @@
 % Requires Latex2e, ver.2000.06
 
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2020/04/06}
+\def\imsfmt@version{2020/05/28}
 
 \ProvidesFile{imsart.sty}
         [\imsfmt@version IMS article style (VS)]
@@ -155,7 +155,6 @@
    \def\journal@issn@print{1936-0975}
    \def\journal@issn@electronic{1931-6690}
    \def\journal@url{http://bayesian.org}
-%   \AtEndOfPackage{\let\affiliation\@gobble}
    \@balayouttrue
    \@noundefthanksreftrue
    \@addressasfootnotetrue
@@ -427,43 +426,49 @@
 % \set@page@layout{\textwidth}{\textheight}
 
 \def\set@page@layout#1#2{%
-%
-  \setlength\textwidth{#1}
-  \@settopoint\textwidth
-  \setlength\textheight{#2}
-  \@settopoint\textheight
-%
-% make side margins equal:
-  \setlength\@tempdima        {\paperwidth}
-  \addtolength\@tempdima      {-\textwidth}
-  \setlength\oddsidemargin    {.5\@tempdima}
-  \addtolength\oddsidemargin  {-1in}
-  \setlength\evensidemargin   {\oddsidemargin}
-  \@settopoint\oddsidemargin
-  \@settopoint\evensidemargin
-%
-% topmargin
-  \setlength\topmargin{\paperheight}
-  \addtolength\topmargin{-2in}
-  \addtolength\topmargin{-\headheight}
-  \addtolength\topmargin{-\headsep}
-  \addtolength\topmargin{-\textheight}
-  \addtolength\topmargin{-\footskip}     % this might be wrong!
-  \addtolength\topmargin{-.5\topmargin}
-  \@settopoint\topmargin
-%
-% check if tw and th were not alterred
-  \xdef\imsart@check@textwidth{\the\textwidth}
-  \xdef\imsart@check@textheight{\the\textheight}
-  \AtEndDocument{%
-    \ifdim\textwidth=\imsart@check@textwidth\else
-      \@latex@error{\string\textwidth\space cannot be altered}\@ehc
-    \fi
-    \ifdim\textheight=\imsart@check@textheight\else
-      \@latex@error{\string\textheight\space cannot be altered}\@ehc
-    \fi
-  }
-}
+    %
+    \setlength\textwidth{#1}%
+    \@settopoint\textwidth
+    \setlength\textheight{#2}%
+    \@settopoint\textheight
+    %
+    % make side margins equal:
+    \setlength\@tempdima        {\paperwidth}
+    \addtolength\@tempdima      {-\textwidth}
+    \setlength\oddsidemargin    {.5\@tempdima}
+    \addtolength\oddsidemargin  {-1in}
+    \setlength\evensidemargin   {\oddsidemargin}
+    \@settopoint\oddsidemargin
+    \@settopoint\evensidemargin
+    %
+    % topmargin
+    \setlength\topmargin{\paperheight}
+    \addtolength\topmargin{-2in}
+    \addtolength\topmargin{-\headheight}
+    \addtolength\topmargin{-\headsep}
+    \addtolength\topmargin{-\textheight}
+    \addtolength\topmargin{-\footskip}     % this might be wrong!
+    \addtolength\topmargin{-.5\topmargin}
+    \@settopoint\topmargin
+    %
+    % check if tw and th were not alterred
+    \xdef\imsart@check@textwidth{\the\textwidth}
+    \xdef\imsart@check@textheight{\the\textheight}
+    \AtEndDocument{%
+        \@ifundefined{do@not@check@textbox@alter}%
+            {%
+                \ifdim\textwidth=\imsart@check@textwidth
+                \else
+                    \PackageError{imsart}{\string\textwidth\space cannot be altered}\@ehc
+                \fi
+                \ifdim\textheight=\imsart@check@textheight
+                \else
+                    \PackageError{imsart}{\string\textheight\space cannot be altered}\@ehc
+                \fi
+            }
+            {}%
+        }
+    }
 
 \def\set@preedit@page@layout{%
   \setlength\paperwidth{\textwidth}%
@@ -493,8 +498,6 @@
     \if@old@layout
         \set@page@layout{30pc}{550pt}
         \@addressatendtrue
-    \else
-        \AtEndOfPackage{\let\affiliation\@gobble}
     \fi
 \fi
 
@@ -614,7 +617,6 @@
 \let\ims@pagenumbering\pagenumbering
 
 %%%%%%%%% check last page %%%%%%%%%%%%%%
-\RequirePackage{etoolbox}
 \newbool{checklpage}
 \def\check@last@page{%
   \ifbool{checklpage}
@@ -1566,7 +1568,7 @@
             \@ifundefined{author@direct@thanksref}%
                 {}%
                 {%
-                    \eappto\tmp@author@thanksrefs{\tmp@sep\tmp@author@direct@thanksref}%
+                    \eappto\tmp@author@thanksrefs{\tmp@sep\author@direct@thanksref}%
                     \edef\tmp@sep{,}%
                 }%
             \@ifundefined{author@\the\c@author @ead@mark}%
@@ -2252,6 +2254,7 @@
     \RequirePackage{times}
     \RequirePackage[scaled=.9]{helvet}
     \RequirePackage{textcomp}
+    \RequirePackage{textcase}
     \def\@xipt{11}
     \def\@xivpt{14}
     \def\@xvipt{16}
@@ -2558,6 +2561,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set up parameters for the STS journal layout:
 
 \if@stslayout
+
+  \RequirePackage{textcase}
 
   \setpkgattr{frontmatter} {style} {\raggedright}
   \setpkgattr{title}       {style} {\noindent\raggedright}
@@ -3073,7 +3078,7 @@
   \renewcommand\specialsection{\@startsection {section}{1}{\z@}%
                                    {\medskipamount}%
                                    {\smallskipamount}%
-                                   {\normalsize\centering\MakeUppercase}}
+                                   {\normalsize\centering\MakeTextUppercase}}
 
 \fi
 
@@ -3095,7 +3100,7 @@
   \renewcommand\section{\@startsection {section}{1}{\z@}%
                                      {\medskipamount}%
                                      {\smallskipamount}%
-                                     {\centering\TO@fl\normalsize\sffamily\fontseries{bx}\selectfont\mathversion{bold}\MakeUppercase}}
+                                     {\centering\TO@fl\normalsize\sffamily\fontseries{bx}\selectfont\mathversion{bold}\MakeTextUppercase}}
 
   \renewcommand\subsection{\@startsection {subsection}{2}{\z@}%
                                      {\smallskipamount}%
@@ -3121,7 +3126,7 @@
   \renewcommand\specialsection{\@startsection {section}{1}{\z@}%
                                    {\bigskipamount}%
                                    {\smallskipamount}%
-                                   {\normalsize\centering\MakeUppercase}}
+                                   {\normalsize\centering\MakeTextUppercase}}
 
 % Format for the counter:
   \def\section@numbersep{.}
@@ -3902,7 +3907,7 @@
 % imsart.cnf imsart-ps.cnf imsart-lnms.cnf
 
 \@input{\imsfmt@name\journal@id.cnf}
-
+\@input{\imsfmt@name-vtex.cnf}
 
 \@twosidetrue
 \pagenumbering{arabic}
