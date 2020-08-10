@@ -32,7 +32,7 @@
 %% The original distribution is located at:
 %% http://www.e-publications.org/ims/support
 %%
-%% This class file loads standart "article.cls" with appropriate 
+%% This class file loads standard "article.cls" with appropriate 
 %% settings and then style file "imsart.sty" with additional macros
 %%
 %% You are free to use this style file as you see fit, provided 
@@ -61,116 +61,103 @@
 %%
 %%
 %% Bug fixes and changes: at end of file
-
+% 
 % TeX programming: Vytas Statulevicius, VTeX, Lithuania.
 % TeX programming: Deimantas Galcius, VTeX, Lithuania.
 % TeX programming: Edgaras Sakuras, VTeX, Lithuania.
 % Requires Latex2e, ver.2000.06
-
+% 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{imsart}[2020/04/06 driver class for package imsart.sty]
-
-% layout options:
-
-\DeclareOption{imslayout}{%
-  \PassOptionsToClass{11pt,oneside,leqno}{article}
-  \PassOptionsToPackage{leqno}{amsmath}}
-
-\DeclareOption{stslayout}{%
-  \PassOptionsToClass{11pt,oneside,leqno}{article}
-  \PassOptionsToPackage{leqno}{amsmath}}
-
+\ProvidesClass{imsart}[2020/08/05 driver class for package imsart.sty]
+% 
 % set various options for different journals:
-\DeclareOption{generic}{%
-  \PassOptionsToClass{10pt,oneside}{article}
-}
-
 \DeclareOption{ps}{%
-  \PassOptionsToClass{10pt,oneside}{article}
-}
-
+    \PassOptionsToClass{10pt,oneside}{article}%
+    }
+% 
 \DeclareOption{ss}{%
-  \PassOptionsToClass{10pt,oneside}{article}
-}
-
+    \PassOptionsToClass{10pt,oneside}{article}%
+    }
+% 
 \DeclareOption{ejs}{%
-  \PassOptionsToClass{10pt,oneside}{article}
-}
-
-\DeclareOption{lnms}{
-  \PassOptionsToClass{10pt,twoside,leqno}{article}
-  \PassOptionsToPackage{leqno}{amsmath}
-}
-
-\DeclareOption{coll}{
-  \PassOptionsToClass{10pt,twoside,leqno}{article}
-  \PassOptionsToPackage{leqno}{amsmath}
-}
-
+    \PassOptionsToClass{10pt,oneside}{article}%
+    }
+% 
+\DeclareOption{lnms}{%
+    \PassOptionsToClass{10pt,twoside,leqno}{article}%
+    \PassOptionsToPackage{leqno}{amsmath}%
+    }
+% 
+\DeclareOption{coll}{%
+    \PassOptionsToClass{10pt,twoside,leqno}{article}%
+    \PassOptionsToPackage{leqno}{amsmath}%
+    }
+% 
 \DeclareOption{aap}{%
-  \PassOptionsToClass{11pt,oneside,leqno}{article}
-  \PassOptionsToPackage{leqno}{amsmath}
-}
-
+    \PassOptionsToClass{11pt,oneside,leqno}{article}%
+    \PassOptionsToPackage{leqno}{amsmath}%
+    }
+% 
 \DeclareOption{aop}{%
-  \PassOptionsToClass{11pt,oneside,leqno}{article}
-  \PassOptionsToPackage{leqno}{amsmath}
-}
-
+    \PassOptionsToClass{11pt,oneside,leqno}{article}%
+    \PassOptionsToPackage{leqno}{amsmath}%
+    }
+% 
 \DeclareOption{aos}{%
-  \PassOptionsToClass{11pt,oneside,leqno}{article}
-  \PassOptionsToPackage{leqno}{amsmath}
-}
-
+    \PassOptionsToClass{11pt,oneside,leqno}{article}%
+    \PassOptionsToPackage{leqno}{amsmath}%
+    }
+% 
 \DeclareOption{aoas}{%
-  \PassOptionsToClass{11pt,oneside,leqno}{article}
-  \PassOptionsToPackage{leqno}{amsmath}
-}
-
+    \PassOptionsToClass{11pt,oneside,leqno}{article}%
+    \PassOptionsToPackage{leqno}{amsmath}%
+    }
+% 
 \DeclareOption{sts}{%
-  \PassOptionsToClass{11pt,oneside,leqno}{article}
-  \PassOptionsToPackage{leqno}{amsmath}
-}
-
+    \PassOptionsToClass{11pt,oneside,leqno}{article}%
+    \PassOptionsToPackage{leqno}{amsmath}%
+    }
+% 
 \DeclareOption{bj}{%
-  \PassOptionsToClass{10pt,oneside}{article}
-}
-
+    \PassOptionsToClass{10pt,oneside}{article}%
+    }
+% 
 \DeclareOption{aihp}{%
-  \PassOptionsToClass{10pt,oneside,fleqn}{article}
-  \PassOptionsToPackage{fleqn}{amsmath}
-  \PassOptionsToPackage{numbers,sort&compress}{natbib}
-}
-
-\DeclareOption{bjps}{
-  \PassOptionsToClass{11pt,twoside}{article}
-}
-
+    \PassOptionsToClass{10pt,oneside,fleqn}{article}%
+    \PassOptionsToPackage{fleqn}{amsmath}%
+    \PassOptionsToPackage{numbers,sort&compress}{natbib}%
+    }
+% 
+\DeclareOption{bjps}{%
+    \PassOptionsToClass{11pt,twoside}{article}%
+    }
+% 
 \DeclareOption{ba}{%
-  \PassOptionsToClass{10pt,oneside}{article}
-}
-
-\ifdefined\loadamssymboptions\else
- \def\loadamssymboptions{\PassOptionsToPackage{psamsfonts}{amssymb}}
-\fi
-
-\loadamssymboptions
+    \PassOptionsToClass{10pt,oneside}{article}%
+    }
+% 
 \PassOptionsToPackage{cmex10}{amsmath}
-
+% 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
 \ProcessOptions*
-
+% 
 \LoadClass{article}
-
-\IfFileExists{imsart.sty}{}{\ClassError{imsart}{The complimentary style file "imsart.sty" is required}{
-The complimentary style file "imsart.sty" is required\MessageBreak
-You need to install file "imsart.sty" in your system\MessageBreak
-File could be downloaded from http://www.e-publications.org/ims/support
-}}
-
+% 
+\IfFileExists{imsart.sty}%
+    {}%
+    {%
+        \ClassError{imsart}%
+            {The complimentary style file "imsart.sty" is required}%
+            {%
+                The complimentary style file "imsart.sty" is required\MessageBreak
+                You need to install file "imsart.sty" in your system\MessageBreak
+                File could be downloaded from http://www.e-publications.org/ims/support
+            }%
+    }
+% 
 % Load additional macros and modifications for "article.cls"
-\RequirePackage[generic]{imsart}
-
+\RequirePackage{imsart}
+% 
 \endinput
 %%
 %% End of file `imsart.cls'.
