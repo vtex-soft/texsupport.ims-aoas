@@ -11,8 +11,6 @@
 %% - Probability Surveys
 %% - Statistics Surveys
 %% - Electronic Journal of Statistics
-%% - IMS Lecture Notes-Monograph Series
-%% - IMS Collections
 %% - Bernoulli
 %% - Annales de l'Institut Henri Poincar\'e - Probabilit\'es et Statistiques
 %% - Brazilian Journal of Probability and Statistics
@@ -67,10 +65,9 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2020/08/06}
+\def\imsfmt@version{2020/10/23}
 %
-\ProvidesFile{imsart.sty}
-        [\imsfmt@version\space IMS article style (VS)]
+\ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
 \RequirePackage{etoolbox}
 %
@@ -140,12 +137,11 @@
 \newif\if@linksfromyear\@linksfromyearfalse
 \DeclareOption{linksfromyear}{\@linksfromyeartrue}
 %
-% For LNMS we need to create a TOC of book, so we will
 % enable writing to .aux
-%
 \newif\if@supertoc \@supertocfalse
 \newif\if@changetoc \@changetocfalse
 %
+% for new thanksref syntax
 \newif\if@updated@thanksref \@updated@thanksreffalse
 %
 % Information about journals
@@ -189,48 +185,6 @@
     \def\journal@issn{ISSN: 1935-7524}%
     \def\journal@url{https://imstat.org/journals-and-publications/electronic-journal-of-statistics/}%
     \AtEndOfPackage{\let\affiliation\@gobble}%
-    }
-%
-\DeclareOption{lnms}{%
-    \def\journal@id{-lnms}%
-    \def\journal@name{IMS Lecture Notes--Monograph Series }%
-    \@twosidetrue
-    \def\copyrightowner@text{Institute of Mathematical Statistics}%
-    \def\journal@issn{$\copyright$~\ims@href{http://www.imstat.org}{\copyrightowner@text}, 
-        \@copyrightyear}%
-    \def\journal@url{https://imstat.org/journals-and-publications/lecture-notes-monograph-series/}%
-    \set@page@layout{30pc}{610pt}% 30pc * 51 line
-    \input{leqno.clo}% formula numbers at left
-    \@amsmath@leqnotrue
-    \@historyasfootnotetrue
-    \@keywordsasfootnotetrue
-    \@addressasfootnotetrue
-    \@supertoctrue
-    \AtBeginDocument{%
-        \setpkgattr{title}{skip}{28\p@}%
-        \setpkgattr{keywordname}{size}{\itshape}%
-        }%
-    }
-%
-\DeclareOption{coll}{%
-    \def\journal@id{-coll}%
-    \def\journal@name{IMS Collections }%
-    \@twosidetrue
-    \def\copyrightowner@text{Institute of Mathematical Statistics}%
-    \def\journal@issn{$\copyright$~\ims@href{http://www.imstat.org}{\copyrightowner@text}, 
-        \@copyrightyear}%
-    \def\journal@url{https://imstat.org/journals-and-publications/ims-collections/}%
-    \set@page@layout{30pc}{610pt}% 30pc * 51 line
-    \input{leqno.clo}% formula numbers at left
-    \@amsmath@leqnotrue
-    \@historyasfootnotetrue
-    \@keywordsasfootnotetrue
-    \@addressasfootnotetrue
-    \@supertoctrue
-    \AtBeginDocument{%
-        \setpkgattr{title}{skip}{28\p@}%
-        \setpkgattr{keywordname}{size}{\itshape}%
-        }%
     }
 %
 % Options for the IMS journals:
@@ -391,13 +345,6 @@
     \numberlines@false
     }
 %
-% use this option for pre-publication (preprint):
-\DeclareOption{preprint}{%
-    \singlespacing
-    \AtBeginDocument{\let\info@line\@empty}%
-    \numberlines@false
-    }
-%
 % use this option for pre-edition
 \DeclareOption{preedit}{%
     \doublespacing
@@ -485,7 +432,7 @@
 \@input{\imsfmt@name.cnf}
 %
 % Execute options
-\ExecuteOptions{infoline}
+\ExecuteOptions{}
 \ProcessOptions
 %
 \if@old@layout
@@ -1787,7 +1734,7 @@
     }
 %
 % CONTRIBUTOR
-% For LNMS we must write as index entry:
+% write as index entry:
 % \contributor{Author, F.}{University}
 % \indexentry{Author, F., \textit{Some University}}{}
 %
@@ -2178,29 +2125,29 @@
 %
 \def\ims@common@float@settings{%
     % float parameters:
-    \setlength\floatsep{18\p@ \@plus 6\p@ \@minus 2\p@}
-    \setlength\textfloatsep{18\p@ \@plus 6\p@ \@minus 2\p@}
-    \setlength\intextsep{18\p@ \@plus 6\p@ \@minus 2\p@}
-    \setlength\dblfloatsep{18\p@ \@plus 6\p@ \@minus 2\p@}
-    \setlength\dbltextfloatsep{24\p@ \@plus 6\p@ \@minus 2\p@}
+    \setlength\floatsep{18\p@ \@plus 6\p@ \@minus 2\p@}%
+    \setlength\textfloatsep{18\p@ \@plus 6\p@ \@minus 2\p@}%
+    \setlength\intextsep{18\p@ \@plus 6\p@ \@minus 2\p@}%
+    \setlength\dblfloatsep{18\p@ \@plus 6\p@ \@minus 2\p@}%
+    \setlength\dbltextfloatsep{24\p@ \@plus 6\p@ \@minus 2\p@}%
     % For floats on a separate float page or column:
-    \setlength\@fptop{0\p@ \@plus 1fil}
-    \setlength\@fpsep{8\p@ \@plus 1000fil}
-    \setlength\@fpbot{0\p@ \@plus 1fil}
-    \setlength\@dblfptop{0\p@ \@plus 1fil}
-    \setlength\@dblfpsep{8\p@ \@plus 1000fil}
-    \setlength\@dblfpbot{0\p@ \@plus 1fil}
+    \setlength\@fptop{0\p@ \@plus 1fil}%
+    \setlength\@fpsep{8\p@ \@plus 1000fil}%
+    \setlength\@fpbot{0\p@ \@plus 1fil}%
+    \setlength\@dblfptop{0\p@ \@plus 1fil}%
+    \setlength\@dblfpsep{8\p@ \@plus 1000fil}%
+    \setlength\@dblfpbot{0\p@ \@plus 1fil}%
     % float counters:
-    \setcounter{topnumber}{5}
-    \renewcommand\topfraction{.99}
-    \setcounter{bottomnumber}{5}
-    \renewcommand\bottomfraction{.99}
-    \setcounter{totalnumber}{10}
-    \renewcommand\textfraction{.05}
-    \renewcommand\floatpagefraction{.9}
-    \setcounter{dbltopnumber}{5}
-    \renewcommand\dbltopfraction{.99}
-    \renewcommand\dblfloatpagefraction{.8}
+    \setcounter{topnumber}{5}%
+    \renewcommand\topfraction{.99}%
+    \setcounter{bottomnumber}{5}%
+    \renewcommand\bottomfraction{.99}%
+    \setcounter{totalnumber}{10}%
+    \renewcommand\textfraction{.05}%
+    \renewcommand\floatpagefraction{.9}%
+    \setcounter{dbltopnumber}{5}%
+    \renewcommand\dbltopfraction{.99}%
+    \renewcommand\dblfloatpagefraction{.8}%
     }
 %
 \def\set@amsgen@frenchspacing{%
@@ -2236,8 +2183,6 @@
     %
     \setpkgattr{abstract}{size}{\small\upshape\mdseries}
     \setpkgattr{keyword}{size}{\small\upshape\mdseries\rightskip=\the\rightskip plus1.0fil}
-    % MSC not changed to 2020 in BA yet
-    \setpkgattr{keyword}{MSC}{MSC 2010 subject classifications:}
     %
     \setpkgattr{ead}{size}{\upshape}
     \setpkgattr{abstract}{skip}{22\p@}
@@ -2373,11 +2318,11 @@
             \noindent
             \@ifundefined{@stitle}{}{\stitle@fmt{\@stitle}}%
             \@stitlepost
-            (%
+            \ifnum\slink@data@exists>\z@(\fi
             \@ifundefined{slink@doi}{}{\slink@doi@fmt}%
             \@ifundefined{slink@url}{}{\slink@url@fmt}%
             \@ifundefined{@sdatatype}{}{; \@sdatatype}%
-            ).
+            \ifnum\slink@data@exists>\z@)\else\unskip\fi.
             \@ifundefined{@sdescription}{}{\@sdescription}%
             \par
             }%
@@ -4515,13 +4460,14 @@
 % \ref{suppA}
 % \hyperlink{suppA}{text}
 %
+\def\slink@data@exists{0}
 \def\supplement@name{Supplementary Material}
 %
 \def\sname#1{\def\@sname{#1}\def\@currentlabel{#1}}
 \def\stitle#1{\def\@stitle{#1}}
-\def\sdatatype#1{\def\@sdatatype{#1}}
+\def\sdatatype#1{\def\@sdatatype{#1}\xdef\slink@data@exists{1}}
 \def\sfilename#1{}
-\def\slink[#1]#2{\expandafter\def\csname slink@#1\endcsname{#2}}
+\def\slink[#1]#2{\expandafter\def\csname slink@#1\endcsname{#2}\xdef\slink@data@exists{1}}
 \def\sdescription#1{\def\@sdescription{#1}}
 %
 \def\suppsection@fmt{\specialsection*{\supplement@name}}
@@ -4580,11 +4526,11 @@
         {\stitle@fmt{\@stitle}}%
     %
     \\
-    (%
+    \ifnum\slink@data@exists>\z@(\fi
     \@ifundefined{slink@doi}{}{\slink@doi@fmt}%
     \@ifundefined{slink@url}{}{\slink@url@fmt}%
     \@ifundefined{@sdatatype}{}{; \@sdatatype}%
-    ).
+    \ifnum\slink@data@exists>\z@). \fi
     \@ifundefined{@sdescription}{}{\@sdescription}%
     \par
     }
@@ -4675,7 +4621,7 @@
 % INITIALIZATION
 %
 % Read local configuration file (if exist):
-% imsart.cnf imsart-ps.cnf imsart-lnms.cnf
+% imsart.cnf imsart-ps.cnf
 %
 \@input{\imsfmt@name\journal@id.cnf}
 \@input{\imsfmt@name-vtex.cnf}

@@ -11,8 +11,6 @@
 %%   Probability Surveys
 %%   Statistics Surveys
 %%   Electronic Journal of Statistics
-%%   IMS Lecture Notes-Monograph Series
-%%   IMS Collections
 %%   Bernoulli
 %%   Annales de l'Institut Henri Poincar\'e - Probabilit\'es et Statistiques
 %%   Brazilian Journal of Probability and Statistics
@@ -68,7 +66,7 @@
 % Requires Latex2e, ver.2000.06
 % 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{imsart}[2020/08/05 driver class for package imsart.sty]
+\ProvidesClass{imsart}[2020/08/23 driver class for package imsart.sty]
 % 
 % set various options for different journals:
 \DeclareOption{ps}{%
@@ -81,16 +79,6 @@
 % 
 \DeclareOption{ejs}{%
     \PassOptionsToClass{10pt,oneside}{article}%
-    }
-% 
-\DeclareOption{lnms}{%
-    \PassOptionsToClass{10pt,twoside,leqno}{article}%
-    \PassOptionsToPackage{leqno}{amsmath}%
-    }
-% 
-\DeclareOption{coll}{%
-    \PassOptionsToClass{10pt,twoside,leqno}{article}%
-    \PassOptionsToPackage{leqno}{amsmath}%
     }
 % 
 \DeclareOption{aap}{%
