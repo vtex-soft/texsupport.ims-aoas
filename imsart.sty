@@ -28,7 +28,7 @@
 %% Please submit bugs or your comments to latex-support@vtex.lt
 %%
 %% The original distribution is located at:
-%% http://www.e-publications.org/ims/support
+%% https://www.e-publications.org/ims/support
 %%
 %% This style file contains additional macros and is designed to use
 %% with standard "article.cls"
@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2020/10/23}
+\def\imsfmt@version{2020/11/02}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -981,6 +981,7 @@
 \else
     \def\doi@base{https://doi.org/}
 \fi
+\@onlypreamble\doi
 %
 \protected\def\relateddoi{\@ifnextchar[{\@tempswatrue\@relateddoi}{\@tempswafalse\@relateddoi[]}}
 \def\@relateddoi[#1]#2#3{\protect\ims@href{\doi@base#3}{#3}}
@@ -1000,13 +1001,14 @@
 %
 \def\arxiv#1{%
     \gdef\@arxiv{#1}%
-    \gdef\doi@text{\url@fmt{arXiv: }{\ttfamily}{#1}{\arxiv@base\@arxiv}}%
-    }
+    \thankstext[]{fm@arXiv}{\protect\url@fmt{arXiv: }{}{#1}{\arxiv@base\@arxiv}}%
+    }%
 %
 \let\@arxiv\relax
+\@onlypreamble\arxiv
 %
-% http://arxiv.org/abs/math.PR/0603300
-\def\arxiv@base{http://arxiv.org/abs/}
+% https://arxiv.org/abs/math.PR/0603300
+\def\arxiv@base{https://arxiv.org/abs/}
 %
 % {url}{text}
 \def\ims@href#1#2{#2}
@@ -2331,7 +2333,7 @@
         \appto\set@natbib{\setlength\bibsep{6pt}}%
         %
         \csdef{copyrightowner@text}{International Society for Bayesian Analysis}%
-        \def\journal@issn{$\copyright$~\ims@href{http://www.imstat.org}{\copyrightowner@text}, 
+        \def\journal@issn{$\copyright$~\ims@href{https://www.imstat.org}{\copyrightowner@text}, 
             \@copyrightyear}%
         \setpkgattr{issuedata}{text}{%
             \ims@href{\journal@url}{\journal@name}%
@@ -2664,11 +2666,10 @@
             }%
         }
     \setpkgattr{title}{skip}{12\p@}
-    \setpkgattr{abstractname}{skip}{}
     \setpkgattr{frontmatter}{cmd}{\vskip20\p@ plus 3\p@ minus 3\p@}
     %
     \setpkgattr{abstract}{width}{23pc}
-    \setpkgattr{abstract}{indent}{16pt} %2em
+    \setpkgattr{abstract}{indent}{16pt\@gobble}% 2em and remove abstract name 
     %
     \setpkgattr{title}{size}{\normalsize\bfseries\mathversion{bold}\spaceskip.5em}
     \setpkgattr{author}{size}{\normalsize\scshape}
@@ -2687,7 +2688,6 @@
         \setcounter{secnumdepth}{5}
         \setcounter{tocdepth}{6}
     \fi
-    \setpkgattr{abstractname}{size}{\itshape}
     \setpkgattr{keywordname}{size}{\itshape}
     \setpkgattr{runninghead}{size}{\footnotesize}
     \setpkgattr{pagenumber}{size}{\small}
@@ -3391,7 +3391,7 @@
 %
 % this splits MR... (...)
 \def\@MR#1 #2\relax#3{%
-    \href{http://www.ams.org/mathscinet-getitem?mr=#1}%
+    \href{https://www.ams.org/mathscinet-getitem?mr=#1}%
     {\MRfixed{#3}}%
     }%
 %
@@ -3430,7 +3430,7 @@
     \@ifundefined{user@hy@keywords}{}{\global\let\@pdfkeywords\user@hy@keywords}%
     %
     % MathSciNet:
-    % \def\MR##1{\href{http://www.ams.org/mathscinet-getitem?mr=##1}{MR##1}}
+    % \def\MR##1{\href{https://www.ams.org/mathscinet-getitem?mr=##1}{MR##1}}
     % MR with hyperef
     \def\MR##1{\@MR##1 \relax{##1}}%
     }
@@ -4451,7 +4451,7 @@
 % \sname{Supplement A}
 % \stitle{}
 % \slink[doi]{}
-% \slink[url]{http://lib.stat.cmu.edu/aoas/???/???}
+% \slink[url]{https://lib.stat.cmu.edu/aoas/???/???}
 % \sdatatype{.zip}
 % \sfilename{foo.zip}
 % \sdescription{}
