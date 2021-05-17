@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2020/11/02}
+\def\imsfmt@version{2021/05/17}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -353,6 +353,21 @@
         \set@preedit@page@layout
         }%
     \numberlines@false
+    }
+%
+% for preprint or supplement articles - removes journal info
+\newif\if@imsart@preprint \@imsart@preprintfalse
+\ifcsundef{imsart@preprint@settings}%
+    {%
+        \def\imsart@preprint@settings{%
+            \global\@imsart@preprinttrue
+            \let\info@line\@empty
+            \numberlines@false
+            }%
+    }%
+    {}
+\DeclareOption{preprint}{%
+    \imsart@preprint@settings
     }
 %
 % Initiate some info:
@@ -800,6 +815,11 @@
 \newif\ifnot@ead@star
 \newif\if@printead@opt
 %
+\def\printead@presep{}
+\def\printead@text{}
+\define@key{printead}{text}{\def\printead@text{#1}}
+\define@key{printead}{presep}{\def\printead@presep{#1}}
+%
 \DeclareRobustCommand{\printead}{%
     \@ifstar{\not@ead@starfalse\@printead}{\not@ead@startrue\@printead}%
     }
@@ -810,8 +830,14 @@
 %
 \def\@@printead[#1]#2{{%
     \if@printead@opt%[]
-        \def\ims@href@text{#1}%
-        \not@ead@starfalse
+        \setkeys{printead}{#1}%
+        \printead@presep
+        \ifx\printead@text\@empty
+            \@printead@optfalse
+        \else
+            \def\safe@href@text{\printead@text}%
+            \not@ead@starfalse
+        \fi
     \fi
     \let\prev@ead@text\relax
     \let\@ead@sep\relax
@@ -1375,13 +1401,17 @@
 %
 % TEXT, etc.
 \setpkgattr{doi}{text}{\url@fmt{url: }{\ttfamily}{\paper@url}{\paper@url}}
-\setpkgattr{copyright}{text}{%
-    \url@fmt{}{\bfseries}{\journal@name}{\journal@url}\break
-    \@ifundefined{volume@title}{}{\textbf{\volume@title}\break}%
-    \@ifnonempty{\@volume\@pubyear\@pagerange\break}%
-    \@ifnonempty{\journal@issn\break}%
-    \doi@text
-    }
+\if@imsart@preprint
+    \setpkgattr{copyright}{text}{}
+\else
+    \setpkgattr{copyright}{text}{%
+        \url@fmt{}{\bfseries}{\journal@name}{\journal@url}\break
+        \@ifundefined{volume@title}{}{\textbf{\volume@title}\break}%
+        \@ifnonempty{\@volume\@pubyear\@pagerange\break}%
+        \@ifnonempty{\journal@issn\break}%
+        \doi@text
+        }
+\fi
 %
 \setpkgattr{infoline}{text}{%
     \lower12pt%
@@ -1568,6 +1598,10 @@
     \thanksref{CoRreCtIoNnOtE}%
     \g@addto@macro\title@endhook{\thankstext{CoRreCtIoNnOtE}{#1}}%
     }
+\def\title@supportinfo#1{%
+    \thanksref{SuPpOrTiNfO}%
+    \g@addto@macro\title@endhook{\thankstext{SuPpOrTiNfO}{#1}}%
+    }
 \def\title#1{%
     \vglue\title@skip
     % check if we are in {frontmatter}
@@ -1576,6 +1610,7 @@
     \bgroup
         \no@harm
         \let\correctionnote\@gobble
+        \let\support\@gobble
         \xdef\@argi{#1}%
         \xdef\@title{#1}%
     \egroup
@@ -1585,6 +1620,7 @@
     \fi
     \bgroup
         \let\correctionnote\title@correctionnote
+        \let\support\title@supportinfo
         \title@style\title@size\title@case{#1}\par
     \egroup
     \title@endhook
@@ -2335,13 +2371,18 @@
         \csdef{copyrightowner@text}{International Society for Bayesian Analysis}%
         \def\journal@issn{$\copyright$~\ims@href{https://www.imstat.org}{\copyrightowner@text}, 
             \@copyrightyear}%
-        \setpkgattr{issuedata}{text}{%
-            \ims@href{\journal@url}{\journal@name}%
-            \space\@pubyear
-            \hskip5pc%
-            \@ifnonempty{\textbf{\@volume}, Number \@issue, pp. \@pagerange}%
-            }%
-        \setpkgattr{copyright}{text}{\copyright@owner \hfill \doi@text}%
+        \if@imsart@preprint
+            \setpkgattr{issuedata}{text}{}
+            \setpkgattr{copyright}{text}{}
+        \else
+            \setpkgattr{issuedata}{text}{%
+                \ims@href{\journal@url}{\journal@name}%
+                \space\@pubyear
+                \hskip5pc%
+                \@ifnonempty{\textbf{\@volume}, Number \@issue, pp. \@pagerange}%
+                }%
+            \setpkgattr{copyright}{text}{\copyright@owner \hfill \doi@text}%
+        \fi
         \setpkgattr{copyright}{owner}{$\copyright$~\@copyrightyear \copyrightowner@text}%
         }
     \def\@floatboxreset{%
@@ -2376,19 +2417,6 @@
     \AtBeginDocument{%
         \@ifpackageloaded{amsmath}{\allowdisplaybreaks}{}%
         }
-    % Acknowledgements
-    \setpkgattr{acknowledgement}{name}{Acknowledgments}
-    \setpkgattr{acknowledgement}{size}{\small}
-    \setpkgattr{acknowledgementname}{fmt}{\noindent\normalfont\sffamily\bfseries}
-    \newenvironment{acknowledgement}%
-        {%
-            \vskip0.5\baselineskip
-            \acknowledgement@size
-            {\acknowledgementname@fmt\acknowledgement@name}\par
-            \begingroup\parindent 0pt\parskip 0.5\baselineskip
-        }%
-        {\endgroup}
-    %
     \ifcsvoid{bibdir}{\gdef\bibdir{}}{}
     \def\bibliography#1{%
         \if@filesw
@@ -2700,10 +2728,14 @@
     %
     \setpkgattr{author}{prefix}{By~}
     %
-    \setpkgattr{copyright}{text}{%
-        \url@fmt{}{\itshape}{\journal@name}{\journal@url}\break
-        \@ifnonempty{\@copyrightyear\@volume\@issue\@pagerange\break}\doi@text
-        }
+    \if@imsart@preprint
+        \setpkgattr{copyright}{text}{}
+    \else
+        \setpkgattr{copyright}{text}{%
+            \url@fmt{}{\itshape}{\journal@name}{\journal@url}\break
+            \@ifnonempty{\@copyrightyear\@volume\@issue\@pagerange\break}\doi@text
+            }
+    \fi
     %
     \setpkgattr{url}{text}{URL: }
     \setpkgattr{fullurl}{text}{URL: }
@@ -3020,8 +3052,12 @@
     \setpkgattr{footline}{size}{\footnotesize}
     %
     \setpkgattr{email}{text}{E-mail:~}
-    \setpkgattr{copyright}{text}{\url@fmt{}{\itshape}{\journal@name}{\journal@url}\ 
-        \textbf{\@volume}\@issue\@pubyear\ \@pagerange\\\doi@text}
+    \if@imsart@preprint
+        \setpkgattr{copyright}{text}{}
+    \else
+        \setpkgattr{copyright}{text}{\url@fmt{}{\itshape}{\journal@name}{\journal@url}\ 
+            \textbf{\@volume}\@issue\@pubyear\ \@pagerange\\\doi@text}
+    \fi
     \setpkgattr{history}{postfix}{}
     \setpkgattr{revised}{prefix}{ and revised~}
     \setpkgattr{keyword}{postfix}{}
@@ -3341,10 +3377,14 @@
     \setpkgattr{thebibliography}{size}{\footnotesize}
     \setpkgattr{keyword}{postfix}{\unskip.}
     %
-    \setpkgattr{copyright}{text}{\url@fmt{}{\itshape}{\journal@name}{\journal@url}\break
-        \@ifnonempty{\@volume\@pubyear\@pagerange\break}%
-        \@ifnonempty{\journal@issn\break}\doi@text
-        }%
+    \if@imsart@preprint
+        \setpkgattr{copyright}{text}{}%
+    \else
+        \setpkgattr{copyright}{text}{\url@fmt{}{\itshape}{\journal@name}{\journal@url}\break
+            \@ifnonempty{\@volume\@pubyear\@pagerange\break}%
+            \@ifnonempty{\journal@issn\break}\doi@text
+            }%
+    \fi
     \setpkgattr{email}{text}{E-mail: }
     \setpkgattr{url}{text}{URL: }
     \setpkgattr{fullurl}{text}{URL: }
@@ -3938,6 +3978,27 @@
 \else
     \AtBeginDocument{\@ifpackageloaded{amsthm}{\set@amsthm}{}}
 \fi
+%
+% Acknowledgements
+%
+\def\acknowledgementsname{Acknowledgments}
+\newenvironment{acks}[1][\acknowledgementsname]{\section*{#1}}{\par}
+\let\ack\undefined \let\endack\undefined
+\if@balayout
+    \renewenvironment{acks}[1][\acknowledgementsname]%
+        {%
+            \vskip0.5\baselineskip
+            \small
+            {\noindent\normalfont\sffamily\bfseries\acknowledgementsname}\par
+            \begingroup\parindent 0pt\parskip 0.5\baselineskip
+        }%
+        {\endgroup}
+\fi
+%
+% Funding
+% 
+\def\fundingname{Funding}
+\newenvironment{funding}[1][\fundingname]{\begin{acks}[\fundingname]}{\end{acks}}
 %
 % thebibliography, loading natbib
 %
