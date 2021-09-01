@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2021/05/17}
+\def\imsfmt@version{2021/08/04}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -166,7 +166,6 @@
     \def\journal@name{Probability Surveys }%
     \def\journal@issn{ISSN: 1549-5787}%
     \def\journal@url{https://imstat.org/journals-and-publications/probability-surveys/}%
-    \AtEndOfPackage{\let\affiliation\@gobble}%
     }
 %
 % Information about journals
@@ -175,7 +174,6 @@
     \def\journal@name{Statistics Surveys }%
     \def\journal@issn{ISSN: 1935-7516}%
     \def\journal@url{https://imstat.org/journals-and-publications/statistics-surveys/}%
-    \AtEndOfPackage{\let\affiliation\@gobble}%
     }
 %
 % Information about journals
@@ -184,7 +182,6 @@
     \def\journal@name{Electronic Journal of Statistics }%
     \def\journal@issn{ISSN: 1935-7524}%
     \def\journal@url{https://imstat.org/journals-and-publications/electronic-journal-of-statistics/}%
-    \AtEndOfPackage{\let\affiliation\@gobble}%
     }
 %
 % Options for the IMS journals:
@@ -203,7 +200,7 @@
     \@autosecdottrue
     \@print@bid@doitrue
     \@updated@thanksreftrue
-}
+    }
 %
 \DeclareOption{aop}{%
     \def\journal@id{-aop}%
@@ -251,6 +248,12 @@
     \@autosecdottrue
     \@print@bid@doitrue
     \@updated@thanksreftrue
+    \AtBeginDocument{%
+        \@ifpackagewith{natbib}{number}{%
+            \@latex@error{Only author-year citations are allowed!
+                Please use the option 'authoryear' of 'natbib' package}{}%
+            }%
+        }%
     }
 %
 \DeclareOption{sts}{%
@@ -262,6 +265,7 @@
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
     \@stslayouttrue
+    \@twocolumntrue
     \AtEndPreamble{\if@twocolumn\set@page@layout{528.62625pt}{702.75pt}\fi}%
     }
 %
@@ -272,8 +276,13 @@
     \set@page@layout{34pc}{574pt}%
     \@twosidetrue
     \@bjlayouttrue
-    \AtEndOfPackage{\let\affiliation\@gobble}%
     \@updated@thanksreftrue
+    \AtBeginDocument{%
+        \@ifpackagewith{natbib}{authoryear}{%
+            \@latex@error{Only numerical citations are allowed!
+                Please use the option 'numbers' of 'natbib' package}{}%
+            }%
+        }%
     }
 %
 \DeclareOption{aihp}{%
@@ -284,9 +293,14 @@
     \set@page@layout{169.475mm}{56pc}%
     \@twosidetrue
     \@aihplayouttrue
-    \AtEndOfPackage{\let\affiliation\@gobble}%
     \@updated@thanksreftrue
-}
+    \AtBeginDocument{%
+        \@ifpackagewith{natbib}{authoryear}{%
+            \@latex@error{Only numerical citations are allowed!
+                Please use the option 'numbers' of 'natbib' package}{}%
+            }%
+        }%
+    }
 %
 \DeclareOption{bjps}{%
     \def\journal@id{-bjps}%
@@ -296,7 +310,6 @@
     \@twosidetrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
-    \@addressatendtrue
     \@bjpslayouttrue
     \@updated@thanksreftrue
     }
@@ -463,6 +476,7 @@
     \fi
     \if@bjpslayout
         \set@page@layout{30pc}{550pt}% 30pc * 46 line
+        \@addressatendtrue
     \fi
     \if@stslayout
         \set@page@layout{32pc}{658pt}% 32pc * 55 line
@@ -1770,6 +1784,7 @@
         #2\par
     \egroup
     }
+\AtEndOfPackage{\def\affiliation#1{\@latex@error{Command '\string\affiliation' is no longer in use}{}}}%
 %
 % CONTRIBUTOR
 % write as index entry:
@@ -2810,6 +2825,9 @@
     \setlength\footskip{24\p@}
     \setlength\parskip{0\p@}
     \setlength\topskip{10\p@}
+    \setlength\maxdepth{.5\topskip}
+    \setlength\parindent{10\p@}
+    \sv@parindent=\parindent
     %
     \declaremathsizes@as@in@mathtime
     \DeclareMathSizes{\@xxivpt}{\@xxivpt}{16}{12}
@@ -3039,6 +3057,7 @@
     \setpkgattr{author}{size}{\normalsize}
     \setpkgattr{fnms}{size}{\uppercase}
     \setpkgattr{snm}{size}{\uppercase}
+    \let\inits@size\@gobble
     %
     \setpkgattr{address}{size}{\small\itshape}
     \setpkgattr{abstract}{size}{\small\upshape}
@@ -3216,7 +3235,7 @@
     \setpkgattr{abstract}{width}{\textwidth}
     \setpkgattr{abstract}{indent}{\z@}
     \setpkgattr{keyword}{width}{\textwidth}
-    \setpkgattr{keyword}{indent}{\z@} %
+    \setpkgattr{keyword}{indent}{\z@}
     %
     % FRONT MATTER FONTS
     \setpkgattr{title}{size}{\huge}
@@ -3224,6 +3243,7 @@
     \setpkgattr{abstract}{size}{\small\upshape}
     \setpkgattr{keywordname}{size}{\itshape}
     \setpkgattr{thebibliography}{size}{\footnotesize}
+    \let\inits@size\@gobble
     \setcounter{tocdepth}{6}
     %
     \def\put@fmt@data{%
@@ -3370,12 +3390,12 @@
     \setpkgattr{abstractname}{skip}{.\enskip}
     %
     \setpkgattr{title}{size}{\Large\bfseries\mathversion{bold}}
-    \setpkgattr{address}{size}{\scriptsize}
     \setpkgattr{keywordname}{size}{\itshape}
     \setpkgattr{runninghead}{size}{\footnotesize}
     \setpkgattr{pagenumber}{size}{\small}
     \setpkgattr{thebibliography}{size}{\footnotesize}
     \setpkgattr{keyword}{postfix}{\unskip.}
+    \let\inits@size\@gobble
     %
     \if@imsart@preprint
         \setpkgattr{copyright}{text}{}%
@@ -3385,9 +3405,20 @@
             \@ifnonempty{\journal@issn\break}\doi@text
             }%
     \fi
-    \setpkgattr{email}{text}{E-mail: }
-    \setpkgattr{url}{text}{URL: }
-    \setpkgattr{fullurl}{text}{URL: }
+    \if@old@layout
+        \setpkgattr{address}{size}{\scriptsize}
+        \setpkgattr{email}{text}{E-mail: }
+        \setpkgattr{url}{text}{URL: }
+        \setpkgattr{fullurl}{text}{URL: }
+    \else
+        \setpkgattr{address}{style}{\centering\normalfont}
+        \setpkgattr{address}{size}{\scriptsize\itshape}
+        \setpkgattr{ead}{size}{}
+        \setpkgattr{ead}{sep}{; }
+        \setpkgattr{email}{text}{}
+        \setpkgattr{url}{text}{}
+        \setpkgattr{fullurl}{text}{}
+    \fi
     \setcounter{tocdepth}{6}
     \def\thethanks{\@arabic\c@thanks}
     \def\theaddressref{\alph{addressref}}
