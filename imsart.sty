@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2021/08/04}
+\def\imsfmt@version{2021/09/29}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -249,7 +249,7 @@
     \@print@bid@doitrue
     \@updated@thanksreftrue
     \AtBeginDocument{%
-        \@ifpackagewith{natbib}{number}{%
+        \@ifpackagewith{natbib}{numbers}{%
             \@latex@error{Only author-year citations are allowed!
                 Please use the option 'authoryear' of 'natbib' package}{}%
             }%
@@ -277,12 +277,6 @@
     \@twosidetrue
     \@bjlayouttrue
     \@updated@thanksreftrue
-    \AtBeginDocument{%
-        \@ifpackagewith{natbib}{authoryear}{%
-            \@latex@error{Only numerical citations are allowed!
-                Please use the option 'numbers' of 'natbib' package}{}%
-            }%
-        }%
     }
 %
 \DeclareOption{aihp}{%
@@ -312,6 +306,12 @@
     \@keywordsasfootnotetrue
     \@bjpslayouttrue
     \@updated@thanksreftrue
+    \AtBeginDocument{%
+        \@ifpackagewith{natbib}{numbers}{%
+            \@latex@error{Only author-year citations are allowed!
+                Please use the option 'authoryear' of 'natbib' package}{}%
+            }%
+        }%
     }
 %
 %% Layouts:
