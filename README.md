@@ -15,7 +15,7 @@ The following files are given in the repository (or directly in `.zip` archive):
     of your document, proper tagging style, layout features, etc;
 -   `figure1.eps`, `figure1.pdf` - sample figures for `aoas-sample.pdf`;
 -   `aoas-sample.tex` - source file for the instructions paper `aoas-sample.pdf`;
--   `acmtrans-ims.bst`, `imsart-nameyear.bst`, `imsart-number.bst` - BibTeX styles to prepare bibliography file.
+-   `acmtrans-ims.bst`, `imsart-nameyear.bst` - BibTeX styles to prepare bibliography file.
     More information can be found [here](http://www.bibtex.org/Using/) 
     or [here](https://www.latex-tutorial.com/tutorials/bibtex/).
 
