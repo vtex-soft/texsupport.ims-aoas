@@ -58,21 +58,21 @@
 %% included in the address.                  %%
 %% Additional information can be included in %%
 %% the Acknowledgments section if necessary. %%
+%% ORCID can be inserted by command:         %%
+%% \orcid{0000-0000-0000-0000}               %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\author[A]{\fnms{First} \snm{Author}\ead[label=e1]{first@somewhere.com}},
-\author[B]{\fnms{Second} \snm{Author}\ead[label=e2,mark]{second@somewhere.com}}
+\author[A]{\fnms{First}~\snm{Author}\ead[label=e1]{first@somewhere.com}},
+\author[B]{\fnms{Second}~\snm{Author}\ead[label=e2]{second@somewhere.com}\orcid{0000-0000-0000-0000}}
 \and
-\author[B]{\fnms{Third} \snm{Author}\ead[label=e3,mark]{third@somewhere.com}}
+\author[B]{\fnms{Third}~\snm{Author}\ead[label=e3]{third@somewhere.com}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Addresses                                %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \address[A]{Department,
-University or Company Name,
-\printead{e1}}
+University or Company Name\printead[presep={,\ }]{e1}}
 
 \address[B]{Department,
-University or Company Name,
-\printead{e2,e3}}
+University or Company Name\printead[presep={,\ }]{e2,e3}}
 \end{aug}
 
 \begin{abstract}

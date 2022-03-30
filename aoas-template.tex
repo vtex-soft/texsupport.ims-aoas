@@ -77,17 +77,19 @@
 %% included in the address.                  %%
 %% Additional information can be included in %%
 %% the Acknowledgments section if necessary. %%
+%% ORCID can be inserted by command:         %%
+%% \orcid{0000-0000-0000-0000}               %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\author[A]{\fnms{???} \snm{???}\ead[label=e1]{???@???}},
-\author[B]{\fnms{???} \snm{???}\ead[label=e2,mark]{???@???}}
+\author[A]{\fnms{???}~\snm{???}\ead[label=e1]{???@???}},
+\author[B]{\fnms{???}~\snm{???}\ead[label=e2]{???@???}}
 \and
-\author[B]{\fnms{???} \snm{???}\ead[label=e3,mark]{???@???}}
+\author[B]{\fnms{???}~\snm{???}\ead[label=e3]{???@???}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Addresses                                %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\address[A]{???, \printead{e1}}
+\address[A]{???\printead[presep={,\ }]d{e1}}
 
-\address[B]{???, \printead{e2,e3}}
+\address[B]{???\printead[presep={,\ }]{e2,e3}}
 \end{aug}
 
 \begin{abstract}
