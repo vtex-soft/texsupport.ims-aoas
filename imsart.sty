@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2022/03/30}
+\def\imsfmt@version{2022/04/06}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -297,6 +297,7 @@
     \@amsmath@leqnotrue
     \@stslayouttrue
     \@twocolumntrue
+    \@print@bid@doitrue
     \AtEndPreamble{\if@twocolumn\set@page@layout{528.62625pt}{702.75pt}\fi}%
     }
 %
@@ -310,6 +311,7 @@
     \@bjlayouttrue
     \@autosecdottrue
     \@updated@thanksreftrue
+    \@print@bid@doitrue
     \@load@amsthmtrue
     \@load@amsmathtrue
     \@load@natbibtrue
@@ -327,6 +329,7 @@
     \@amsmath@leqnotrue
     \@aihplayouttrue
     \@updated@thanksreftrue
+    \@print@bid@doitrue
     \AtBeginDocument{%
         \@ifpackagewith{natbib}{authoryear}{%
             \@latex@error{Only numerical citations are allowed!
@@ -345,6 +348,7 @@
     \@keywordsasfootnotetrue
     \@bjpslayouttrue
     \@updated@thanksreftrue
+    \@print@bid@doitrue
     \AtBeginDocument{%
         \@ifpackagewith{natbib}{numbers}{%
             \@latex@error{Only author-year citations are allowed!
@@ -3661,6 +3665,7 @@
     \setpkgattr{title}{size}{\huge}
     \setpkgattr{author}{size}{\Large}
     \setpkgattr{abstract}{size}{\small\upshape}
+    \setpkgattr{ead}{size}{}
     \setpkgattr{keywordname}{size}{\itshape}
     \setpkgattr{thebibliography}{size}{\footnotesize}
     \let\inits@size\@gobble
@@ -3680,9 +3685,9 @@
     \setpkgattr{keyword}{KWD}{Keywords:}
     \setpkgattr{keyword}{MSC2010}{MSC:}
     \setpkgattr{keyword}{postfix}{\unskip}
-    \setpkgattr{email}{text}{E-mail: }
-    %
-    \def\theaddressref{\alph{addressref}}
+    \setpkgattr{email}{text}{}
+    \setpkgattr{url}{text}{}
+    \setpkgattr{fullurl}{text}{}
     %
     \def\labelitemii{\textendash}
     \def\labelitemiv{{\footnotesize +}}
@@ -3718,7 +3723,12 @@
     \emergencystretch=3\p@
     \hbadness=800
     \tolerance=800
-    \AtBeginDocument{\interdisplaylinepenalty=100}
+    \AtBeginDocument{%
+        \interdisplaylinepenalty=100\relax
+        \@ifpackageloaded{hyperref}%
+            {\urlstyle{rm}}%
+            {}%
+        }
     %
     \set@amsgen@frenchspacing
     %
@@ -3834,7 +3844,6 @@
     \setpkgattr{fullurl}{text}{}
     \setcounter{tocdepth}{6}
     \def\thethanks{\@arabic\c@thanks}
-    \def\theaddressref{\alph{addressref}}
     %
     \arraycolsep=1.2\p@
     \setlength\tabbingsep{6\p@}
@@ -4675,7 +4684,23 @@
     \define@key{bid}{mr}{\edef\bid@mr@arg{#1}}
     \define@key{bid}{doi}{\edef\bid@doi@arg{#1}}
     \def\bid@MR#1{\ \MR{#1}\ignorespaces}
-    \def\bid@doiurl#1{\ \ims@href{\doi@base#1}{#1}\ignorespaces}
+    \def\check@doiurl@prefix#1#2#3#4#5\end{%
+        \edef\@doiurlfull{0}%
+        \def\@doiurlhttp{http}%
+        \def\@doiurlstart{#1#2#3#4}%
+        \ifx\@doiurlstart\@doiurlhttp
+            \edef\@doiurlfull{1}%
+        \fi
+        }
+    \def\bid@doiurl#1{\ 
+        \check@doiurl@prefix#1\end
+        \ifnum\@doiurlfull>\z@
+            \ims@href{#1}{#1}%
+        \else
+            \ims@href{\doi@base#1}{\doi@base#1}%
+        \fi
+        \ignorespaces
+        }
 \else
     \define@key{bid}{mr}{\MR{#1}}
     \define@key{bid}{doi}{}
@@ -4702,7 +4727,11 @@
     }
 %
 % for compatibility with old bibtex style
-\def\bdoi#1{\ignorespaces}
+\if@print@bid@doi
+    \let\bdoi\bid@doiurl
+\else
+    \def\bdoi#1{\ignorespaces}
+\fi
 %
 % common@pub@types
 %
@@ -4715,7 +4744,11 @@
     \let\bmisc\@firstofone
     \let\bnote\@firstofone
     \let\banumber\@firstofone
-    \let\bmrnumber\MR
+    \if@print@bid@doi
+        \let\bmrnumber\bid@MR
+    \else
+        \let\bmrnumber\MR
+    \fi
     \let\bid\bbl@bid
     \set@bibl@cmd{bvolume}%
     \csname common@pub@types@hook\endcsname
