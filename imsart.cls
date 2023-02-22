@@ -66,7 +66,7 @@
 % Requires Latex2e, ver.2000.06
 % 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{imsart}[2021/11/07 driver class for package imsart.sty]
+\ProvidesClass{imsart}[2022/04/21 driver class for package imsart.sty]
 % 
 % set various options for different journals:
 \DeclareOption{ps}{%
@@ -108,7 +108,7 @@
 % 
 \DeclareOption{bj}{%
     \PassOptionsToClass{10pt,oneside}{article}%
-    \PassOptionsToPackage{nosetpagesize}{graphicx}%
+    \g@addto@macro\@classoptionslist{,nosetpagesize}%
     \PassOptionsToPackage{sort&compress}{natbib}%
     }
 % 

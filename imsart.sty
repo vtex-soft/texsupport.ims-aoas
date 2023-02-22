@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2022/04/06}
+\def\imsfmt@version{2023/02/22}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -1075,18 +1075,32 @@
     \ifdim\wd\@tempboxa>1pt #1\fi
     }
 %
+\@ifundefined{check@head@line@length}%
+    {\let\check@head@line@length\@gobbletwo}%
+    {}
 % pagestyle{imsheadings} \thispagestyle{copyright}
 \if@twoside
+%
     \def\ps@imsheadings{%
         \def\@oddfoot{\hfill\info@line}%
         \let\@evenfoot\@oddfoot
+        \def\check@head@line@length@even{%
+            \runninghead@size {\pagenumber@size 000\quad}%
+            \evenhead@fmt{\leftmark}{\pagenumber@size\quad 000}%
+            }%
         \def\@evenhead{%
             \runninghead@size
             \rlap{\pagenumber@size\thepage}\evenhead@fmt{\leftmark}%
+            \check@head@line@length{\check@head@line@length@even}{author}%
+            }%
+        \def\check@head@line@length@odd{%
+            \runninghead@size{\pagenumber@size 000\quad}%
+            \oddhead@fmt{\rightmark}{\pagenumber@size\quad 000}%
             }%
         \def\@oddhead{%
             \runninghead@size
             \oddhead@fmt{\rightmark}\llap{\pagenumber@size\thepage}%
+            \check@head@line@length{\check@head@line@length@odd}{title}%
             }%
         }
 \else
@@ -2522,12 +2536,27 @@
 \if@ejs@ps@ss@layout
     \RequirePackage{lmodern}
     \usepackage[T1]{fontenc}
+    \AtEndOfPackage{%
+        \ifcsundef{do@not@scale@lmex}%
+            {% make lmex10 scalable
+                \DeclareFontFamily{OMX}{lmex}{}%
+                \DeclareFontShape{OMX}{lmex}{m}{n}{%
+                    <-> lmex10
+                    }{}%
+            }%
+            {}%
+        }%
 \fi
 %
 % Set up parameters for the BA journal layout:
 \if@balayout
     \RequirePackage{lmodern}
     \usepackage[T1]{fontenc}
+    % make lmex10 scalable
+    \DeclareFontFamily{OMX}{lmex}{}
+    \DeclareFontShape{OMX}{lmex}{m}{n}{%
+        <-> lmex10
+        }{}
     %
     \setlength{\parskip}{0.5\baselineskip}
     \setlength{\parindent}{15pt}
@@ -2600,11 +2629,19 @@
     \def\ps@imsheadings{%
         \def\@oddfoot{\hfill\info@line}%
         \let\@evenfoot\@oddfoot
+        \def\check@head@line@length@even{%
+            \runninghead@size{\pagenumber@size 000\quad}\hfill {\runningtitle@size \rightmark}%
+            }%
         \def\@evenhead{%
             \runninghead@size{\pagenumber@size\thepage}\hfill {\runningtitle@size \rightmark}%
+            \check@head@line@length{\check@head@line@length@even}{title}%
+            }%
+        \def\check@head@line@length@odd{%
+            \runninghead@size{\runningauthor@size \leftmark} \hfill {\pagenumber@size\quad 000}%
             }%
         \def\@oddhead{%
             \runninghead@size{\runningauthor@size \leftmark} \hfill {\pagenumber@size\thepage}%
+            \check@head@line@length{\check@head@line@length@odd}{author}%
             }%
         }
     %
@@ -3298,13 +3335,27 @@
 % Set up parameters for the BJ journal layout:
 %
 \if@bjlayout
+    \IfFileExists{newtxmath.sty}%
+        {\edef\new@tx@math@sty@exists{1}}%
+        {}
     \RequirePackage[T1]{fontenc}
-    \RequirePackage{textcomp}
     \def\rmdefault{utm}
+    \ifdefined\new@tx@math@sty@exists
+        \def\ttdefault{ucr}
+    \else
+        \def\ttdefault{pcr}% ucr in old systems are somewhat buggy
+    \fi
     \RequirePackage[scaled=0.9]{helvet}
-    \def\ttdefault{ucr}
-    \ifdefined\HCode\else
-        \RequirePackage[cmintegrals,bigdelims]{newtxmath}
+    \RequirePackage{textcomp}
+    \ifdefined\HCode
+    \else
+        \ifdefined\new@tx@math@sty@exists
+            \RequirePackage[cmintegrals,bigdelims]{newtxmath}
+        \else
+            \PackageWarning{imsart}{newtxmath package isn't available, 
+                amsmath is used instead}%
+            \RequirePackage{amsmath}
+        \fi
     \fi
     \let\openbox\relax
     \RequirePackage{graphicx}%
@@ -3884,7 +3935,7 @@
 %
 % this splits MR... (...)
 \def\@MR#1 #2\relax#3{%
-    \href{https://www.ams.org/mathscinet-getitem?mr=#1}%
+    \href{https://mathscinet.ams.org/mathscinet-getitem?mr=#1}%
     {\MRfixed{#3}}%
     }%
 %
@@ -3922,8 +3973,6 @@
     \@ifundefined{user@hy@subject}{}{\global\let\@pdfsubject\user@hy@subject}%
     \@ifundefined{user@hy@keywords}{}{\global\let\@pdfkeywords\user@hy@keywords}%
     %
-    % MathSciNet:
-    % \def\MR##1{\href{https://www.ams.org/mathscinet-getitem?mr=##1}{MR##1}}
     % MR with hyperef
     \def\MR##1{\@MR##1 \relax{##1}}%
     }
@@ -4438,6 +4487,7 @@
     \if@amsmath@leqno
         \PassOptionsToPackage{leqno}{amsmath}
     \fi
+    \let\Bbbk\undefined 
     \RequirePackage[cmex10]{amsmath}
     \if@bjlayout
         \RequirePackage{amssymb,mathrsfs}
@@ -4465,10 +4515,12 @@
 %
 \if@imsart@seceqn
     \renewcommand{\theequation}{\thesection.\arabic{equation}}
-    \if@load@amsmath
-        \numberwithin{equation}{section}
-    \else
-        \@addtoreset{equation}{section}
+    \ifdefined\HCode\else
+        \if@load@amsmath
+            \numberwithin{equation}{section}
+        \else
+            \@addtoreset{equation}{section}
+        \fi
     \fi
 \fi
 %
