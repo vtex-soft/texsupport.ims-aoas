@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2023/02/22}
+\def\imsfmt@version{2023/05/19}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -1175,6 +1175,7 @@
 %
 % {url}{text}
 \def\ims@href#1#2{#2}
+\def\ims@nolinkurl#1{#1}
 %
 % {prefix}{font}{text}{url}
 \def\url@fmt#1#2#3#4{%
@@ -3622,8 +3623,7 @@
             {}%
             {%
                 \RequirePackage[colorlinks]{hyperref}%
-                \urlstyle{rm}%
-                \setpkgattr{copyright}{text}{\url@fmt{}{\itshape}{\journal@name}{\journal@url}}%
+                \setpkgattr{copyright}{text}{\raisebox{2pt}{\url@fmt{}{\itshape}{\journal@name}{\journal@url}}}%
             }%
         \appto\set@natbib{%
             \setlength\bibsep{\z@ \@plus .5\p@ \@minus .5\p@}%
@@ -3776,9 +3776,6 @@
     \tolerance=800
     \AtBeginDocument{%
         \interdisplaylinepenalty=100\relax
-        \@ifpackageloaded{hyperref}%
-            {\urlstyle{rm}}%
-            {}%
         }
     %
     \set@amsgen@frenchspacing
@@ -3975,6 +3972,11 @@
     %
     % MR with hyperef
     \def\MR##1{\@MR##1 \relax{##1}}%
+    %
+    \if@print@bid@doi
+        \urlstyle{rm}%
+        \let\ims@nolinkurl\nolinkurl
+    \fi
     }
 %
 \def\write@pdfinfo#1#2{}
@@ -4747,9 +4749,9 @@
     \def\bid@doiurl#1{\ 
         \check@doiurl@prefix#1\end
         \ifnum\@doiurlfull>\z@
-            \ims@href{#1}{#1}%
+            \ims@href{#1}{\ims@nolinkurl{#1}}%
         \else
-            \ims@href{\doi@base#1}{\doi@base#1}%
+            \ims@href{\doi@base#1}{\ims@nolinkurl{\doi@base#1}}%
         \fi
         \ignorespaces
         }
