@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2023/05/19}
+\def\imsfmt@version{2025/03/31}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -195,6 +195,8 @@
     \def\journal@issn{ISSN: 1549-5787}%
     \def\journal@url{https://imstat.org/journals-and-publications/probability-surveys/}%
     \@ejs@ps@ss@layouttrue
+    \@print@bid@doitrue
+    \@imsart@showframetrue
     }
 %
 % Information about journals
@@ -204,6 +206,8 @@
     \def\journal@issn{ISSN: 1935-7516}%
     \def\journal@url{https://imstat.org/journals-and-publications/statistics-surveys/}%
     \@ejs@ps@ss@layouttrue
+    \@print@bid@doitrue
+    \@imsart@showframetrue
     }
 %
 % Information about journals
@@ -213,6 +217,19 @@
     \def\journal@issn{ISSN: 1935-7524}%
     \def\journal@url{https://imstat.org/journals-and-publications/electronic-journal-of-statistics/}%
     \@ejs@ps@ss@layouttrue
+    \@print@bid@doitrue
+    \@imsart@showframetrue
+    }
+\newif\if@ejsn@layout \@ejsn@layoutfalse
+\DeclareOption{ejsn}{%
+    \def\journal@id{-ejs}%
+    \def\journal@name{Electronic Journal of Statistics }%
+    \def\journal@issn{ISSN: 1935-7524}%
+    \def\journal@url{https://imstat.org/journals-and-publications/electronic-journal-of-statistics/}%
+    \@ejs@ps@ss@layouttrue
+    \@print@bid@doitrue
+    \@imsart@showframetrue
+    \@ejsn@layouttrue
     }
 %
 % Options for the IMS journals:
@@ -225,6 +242,7 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
+    \@load@amsthmtrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@imslayouttrue
@@ -241,6 +259,7 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
+    \@load@amsthmtrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@imslayouttrue
@@ -257,6 +276,7 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
+    \@load@amsthmtrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@imslayouttrue
@@ -273,6 +293,7 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
+    \@load@amsthmtrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@imslayouttrue
@@ -295,6 +316,7 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
+    \@load@amsthmtrue
     \@stslayouttrue
     \@twocolumntrue
     \@print@bid@doitrue
@@ -304,7 +326,7 @@
 \DeclareOption{bj}{%
     \def\journal@id{-bj}%
     \def\journal@name{Submitted to Bernoulli }%
-    \def\journal@url{http://www.bernoulli-society.org/index.php/publications/bernoulli-journal/bernoulli-journal}%
+    \def\journal@url{https://www.bernoullisociety.org/index.php/publications/bernoulli-journal/bernoulli-journal}%
     \def\journal@issn{1350-7265}%
     \set@page@layout{34pc}{574pt}%
     \@twosidetrue
@@ -327,6 +349,7 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
+    \@load@amsthmtrue
     \@aihplayouttrue
     \@updated@thanksreftrue
     \@print@bid@doitrue
@@ -344,6 +367,7 @@
     \def\journal@url{https://imstat.org/journals-and-publications/brazilian-journal-of-probability-and-statistics/}%
     \set@page@layout{405pt}{646pt}%
     \@twosidetrue
+    \@load@amsthmtrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@bjpslayouttrue
@@ -399,6 +423,10 @@
 \newif\if@imsart@showframe \@imsart@showframefalse
 \DeclareOption{showframe}{\@imsart@showframetrue}
 \DeclareOption{noshowframe}{\@imsart@showframefalse}
+%
+% twoside (to catch direct use)
+\newif\if@imsart@twoside \@imsart@twosidefalse
+\DeclareOption{twoside}{\global\@imsart@twosidetrue}
 %
 % Combined options:
 %
@@ -472,7 +500,7 @@
     \addtolength\topmargin{-.5\topmargin}%
     \@settopoint\topmargin
     %
-    % check if tw and th are'nt altered
+    % check if tw and th aren't altered
     \xdef\imsart@check@textwidth{\the\textwidth}%
     \xdef\imsart@check@textheight{\the\textheight}%
     \AtEndDocument{%
@@ -510,6 +538,19 @@
 \ExecuteOptions{}
 \ProcessOptions
 %
+\csname imsart@fileinfo\endcsname
+\ifdefined\jobstart@date@info
+\else
+    \edef\jobstart@date@info{\the\year\two@digits{\the\month}\two@digits{\the\day}}
+\fi
+%
+\if@bjlayout
+    \if@imsart@nameyear
+    \else
+        \PassOptionsToPackage{sort&compress}{natbib}%
+    \fi
+\fi
+%
 % dimensions
 %
 \setlength\parindent{12\p@}
@@ -526,6 +567,17 @@
 \setlength\smallskipamount{6\p@ \@plus 1\p@ \@minus 1\p@}
 \setlength\medskipamount{12\p@ \@plus 3\p@ \@minus 3\p@}
 \setlength\bigskipamount{18\p@ \@plus 3\p@ \@minus 3\p@}
+%
+\if@imsart@twoside
+\else
+    \if@ejs@ps@ss@layout
+        % it's twoside but centered
+        \advance\evensidemargin by \oddsidemargin
+        \divide\evensidemargin by \tw@
+        \oddsidemargin=\evensidemargin
+        \marginparwidth=65\p@% as in article with oneside
+    \fi
+\fi
 %
 % setpkgattr, getpkgattr, do@option@list
 %
@@ -1287,6 +1339,10 @@
 \setpkgattr{tablename}{size}{\scshape}
 \setpkgattr{tablename}{skip}{\endgraf}
 %
+\if@ejs@ps@ss@layout
+    \setpkgattr{tablename}{size}{\scshape\upshape}
+\fi
+%
 % figure : use \@makecaption:
 \renewcommand\figurename{Fig}
 %
@@ -1306,6 +1362,10 @@
 \setpkgattr{figurecaption}{size}{\footnotesize\itshape}
 \setpkgattr{figurename}{size}{\scshape}
 \setpkgattr{figurename}{skip}{.~}
+%
+\if@ejs@ps@ss@layout
+    \setpkgattr{figurename}{size}{\scshape\upshape}
+\fi
 %
 \def\@floatboxreset{%
     \reset@font
@@ -1655,7 +1715,13 @@
         \setaftersec@dot{#5}%
         \def\@svsechd{#4{\hskip #1\relax #5\aftersec@dot}}%
     \fi
-    \ifnum\ssection@level=1\phantomsection\addcontentsline{toc}{section}{#5}\fi
+    \ifnum\ssection@level=1%
+        \ifdefined\HCode
+        \else
+            \phantomsection
+        \fi
+        \addcontentsline{toc}{section}{#5}%
+    \fi
     \@xsect{#3}%
     }
 %
@@ -2291,17 +2357,11 @@
 %
 % \kwd[; ]{foo}
 \def\sep{\unskip\string, }
-\newif\if@firstkeywordinlist \@firstkeywordinlisttrue
 %
 \DeclareRobustCommand*\kwd{\@ifnextchar[\@kwd{\@kwd[\kwd@sep]}}
 \def\@kwd[#1]#2{%
     \unskip#1{#2}%
-    \if@firstkeywordinlist
-        \addto@keywords@list{#2}%
-        \@firstkeywordinlistfalse
-    \else
-        \addto@keywords@list{, #2}%
-    \fi
+    \addto@keywords@list{#2}%
     \let\kwd@sep\sep
     }
 %
@@ -2537,6 +2597,7 @@
 \if@ejs@ps@ss@layout
     \RequirePackage{lmodern}
     \usepackage[T1]{fontenc}
+    \UseLegacyTextSymbols% for text bullets, etc.
     \AtEndOfPackage{%
         \ifcsundef{do@not@scale@lmex}%
             {% make lmex10 scalable
@@ -2548,11 +2609,87 @@
             {}%
         }%
 \fi
+\if@ejsn@layout
+    \def\@xipt{11}
+    \def\@xivpt{14}
+    \def\@xvipt{16}
+    \def\@xviiipt{18}
+    \def\@xxpt{20}
+    \def\@xxivpt{24}
+    \IfFileExists{newtxmath.sty}%
+        {\edef\new@tx@math@sty@exists{1}}%
+        {}
+    \RequirePackage[T1]{fontenc}
+    \def\rmdefault{utm}
+    \RequirePackage{nimbusmono}
+    \RequirePackage[scaled=0.9]{nimbussans}
+    \RequirePackage{textcomp}
+    \ifdefined\HCode
+    \else
+        \ifdefined\new@tx@math@sty@exists
+            \RequirePackage[amsthm]{newtxmath}
+        \else
+            \PackageWarning{imsart}{newtxmath package isn't available, 
+                amsmath is used instead}%
+            \RequirePackage{amsmath}
+        \fi
+    \fi
+    \let\openbox\relax
+    \declaremathsizes@as@in@mathtime
+    \renewcommand\normalsize{%
+        \@setfontsize\normalsize\@xipt{14\p@ plus .5\p@ minus .5\p@}%
+        \abovedisplayskip 8\p@ \@plus3\p@ \@minus3\p@
+        \belowdisplayskip\abovedisplayskip
+        \abovedisplayshortskip\abovedisplayskip
+        \belowdisplayshortskip\abovedisplayskip
+        \let\@listi\@listI
+        }
+    \normalfont\normalsize
+    \renewcommand\small{%
+        \@setfontsize\small\@xpt{12.5pt plus .4pt minus .4pt}%
+        \abovedisplayskip 7\p@ \@plus2\p@ \@minus2\p@
+        \belowdisplayskip \abovedisplayskip
+        \abovedisplayshortskip\abovedisplayskip
+        \belowdisplayshortskip\abovedisplayskip
+        }
+    \renewcommand\footnotesize{%
+        \@setfontsize\footnotesize\@ixpt{11.5pt plus .3\p@ minus .3\p@}%
+        \abovedisplayskip 6.5\p@ \@plus2\p@ \@minus2\p@
+        \belowdisplayskip \abovedisplayskip
+        \abovedisplayshortskip\abovedisplayskip
+        \belowdisplayshortskip\abovedisplayskip
+        }
+    \renewcommand\scriptsize{\@setfontsize\scriptsize\@viiipt\@xpt}
+    \renewcommand\tiny{\@setfontsize\tiny\@vipt\@viipt}
+    \renewcommand\large{\@setfontsize\large\@xiipt{15}}
+    \renewcommand\Large{\@setfontsize\Large\@xivpt{17}}
+    \renewcommand\LARGE{\@setfontsize\LARGE\@xvipt{20}}
+    \renewcommand\huge{\@setfontsize\huge\@xviiipt{23}}
+    \renewcommand\Huge{\@setfontsize\Huge\@xxpt{25}}
+    %
+    \setlength{\paperwidth}{6.75in}
+    \setlength{\paperheight}{10in}
+    \set@page@layout{405bp}{646bp}
+    \advance\topmargin by 3.5\p@
+    \ifpdf
+        \ifdefined\pdfpagewidth
+            \pdfpagewidth=\paperwidth
+            \pdfpageheight=\paperheight
+        \else
+            \pagewidth=\paperwidth
+            \pageheight=\paperheight
+        \fi
+    \else
+        \AtBeginDvi{\special{papersize=\the\paperwidth, \the\paperheight}}
+    \fi
+    \setpkgattr{title}{skip}{30\p@}
+\fi
 %
 % Set up parameters for the BA journal layout:
 \if@balayout
     \RequirePackage{lmodern}
     \usepackage[T1]{fontenc}
+    \UseLegacyTextSymbols% for text bullets, etc.
     % make lmex10 scalable
     \DeclareFontFamily{OMX}{lmex}{}
     \DeclareFontShape{OMX}{lmex}{m}{n}{%
@@ -2711,7 +2848,7 @@
         \@namedef{specialsection*}{\section*}%
         \def\stitle@fmt#1{#1}%
         % Supplement case for BA:
-        % macroses: \stitle, \slink[doi], \sdatatype, \sfilename.
+        % macros: \stitle, \slink[doi], \sdatatype, \sfilename.
         \def\stitlepost#1{\gdef\@stitlepost{#1}}%
         \stitlepost{\space}%
         \def\slink@doi@fmt{%
@@ -3341,17 +3478,22 @@
         {}
     \RequirePackage[T1]{fontenc}
     \def\rmdefault{utm}
-    \ifdefined\new@tx@math@sty@exists
-        \def\ttdefault{ucr}
+    \ifnum\jobstart@date@info>20250210
+        \RequirePackage{nimbusmono}
+        \RequirePackage[scaled=0.9]{nimbussans}
     \else
-        \def\ttdefault{pcr}% ucr in old systems are somewhat buggy
+        \ifdefined\new@tx@math@sty@exists
+            \def\ttdefault{ucr}
+        \else
+            \def\ttdefault{pcr}% ucr in old systems are somewhat buggy
+        \fi
+        \RequirePackage[scaled=0.9]{helvet}
     \fi
-    \RequirePackage[scaled=0.9]{helvet}
     \RequirePackage{textcomp}
     \ifdefined\HCode
     \else
         \ifdefined\new@tx@math@sty@exists
-            \RequirePackage[cmintegrals,bigdelims]{newtxmath}
+            \RequirePackage{newtxmath}
         \else
             \PackageWarning{imsart}{newtxmath package isn't available, 
                 amsmath is used instead}%
@@ -3533,24 +3675,19 @@
         }
     %
     \AtBeginDocument{%
-        \ifcsundef{jobstart@date@info}%
-            {\xdef\jobstart@date@info{\the\year\two@digits{\the\month}\two@digits{\the\day}}}%
-            {}%
-        \ifnum\jobstart@date@info>20211202\relax
-            \def\author@sep@by@number#1{%
-                \@tempcntb=\author@num
-                \advance\@tempcntb by \m@ne
-                \ifnum#1=\@tempcntb
-                    \unskip\unkern\ \and
+        \def\author@sep@by@number#1{%
+            \@tempcntb=\author@num
+            \advance\@tempcntb by \m@ne
+            \ifnum#1=\@tempcntb
+                \unskip\unkern\ \and
+            \else
+                \ifnum#1=\author@num
                 \else
-                    \ifnum#1=\author@num
-                    \else
-                        \unskip\unkern,
-                    \fi
+                    \unskip\unkern,
                 \fi
-                \ignorespaces
-                }%
-        \fi
+            \fi
+            \ignorespaces
+            }%
         }
     % invoke \printhistory at end of document:
     \let\old@enddocument\enddocument
@@ -3965,16 +4102,19 @@
     \@ifundefined{hy@subject}{}{\pdfstringdef\@pdfsubject{\hy@subject}}%
     \@ifundefined{hy@keywords}{}{\pdfstringdef\@pdfkeywords{\hy@keywords}}%
     %
-    \@ifundefined{user@hy@title}{}{\global\let\@pdftitle\user@hy@title}%
-    \@ifundefined{user@hy@author}{}{\global\let\@pdfauthor\user@hy@author}%
-    \@ifundefined{user@hy@subject}{}{\global\let\@pdfsubject\user@hy@subject}%
-    \@ifundefined{user@hy@keywords}{}{\global\let\@pdfkeywords\user@hy@keywords}%
+    \@ifundefined{user@hy@title}{}{\pdfstringdef\@pdftitle\user@hy@title}%
+    \@ifundefined{user@hy@author}{}{\pdfstringdef\@pdfauthor\user@hy@author}%
+    \@ifundefined{user@hy@subject}{}{\pdfstringdef\@pdfsubject\user@hy@subject}%
+    \@ifundefined{user@hy@keywords}{}{\pdfstringdef\@pdfkeywords\user@hy@keywords}%
     %
-    % MR with hyperef
+    % MR with hyperref
     \def\MR##1{\@MR##1 \relax{##1}}%
     %
     \if@print@bid@doi
-        \urlstyle{rm}%
+        \if@ejs@ps@ss@layout
+        \else
+            \urlstyle{rm}%
+        \fi
         \let\ims@nolinkurl\nolinkurl
     \fi
     }
@@ -3991,10 +4131,12 @@
     }
 %
 \newtoks\keywords@list
+\let\keywords@list@sep\@empty
 \def\addto@keywords@list#1{%
     \begingroup
         \no@harm
-        \xdef\@act{\global\noexpand\keywords@list{\the\keywords@list#1}}\@act
+        \xdef\@act{\global\noexpand\keywords@list{\the\keywords@list\keywords@list@sep#1}}\@act
+        \xdef\keywords@list@sep{, }%
     \endgroup
     }
 %
@@ -4390,15 +4532,6 @@
             {.}%
             {1em}%
             {}%
-        \newtheoremstyle{remark}%
-            {\medskipamount}%
-            {\medskipamount}%
-            {\normalfont}%
-            {\parindent}%
-            {\scshape}%
-            {.}%
-            {1em}%
-            {}%
         %
         \renewenvironment{proof}[1][\proofname]%
             {%
@@ -4425,15 +4558,6 @@
             {0.5em}%
             {\thmname{##1}\thmnumber{ ##2}\thmnote{ (##3)}}%
         \newtheoremstyle{definition}%
-            {\medskipamount}%
-            {\medskipamount}%
-            {\itshape}%
-            {\z@}%
-            {\bfseries}%
-            {.}%
-            {0.5em}%
-            {}%
-        \newtheoremstyle{remark}%
             {\medskipamount}%
             {\medskipamount}%
             {\normalfont}%
@@ -4471,7 +4595,7 @@
                 \@endpefalse
             }%
         \if@bjpslayout
-            \newtheoremstyle{remark}%
+            \newtheoremstyle{definition}%
                 {\smallskipamount}%
                 {\smallskipamount}%
                 {\normalfont}%
@@ -4480,8 +4604,27 @@
                 {.}%
                 {.5em}%
                 {}%
+        \else
+            \let\th@definition\th@remark
         \fi
-    \else
+    \fi
+    \ifnum\ims@thmshape>\z@
+        \def\th@remark@changeto{%
+            \PackageError{amsthm}{change \string\theoremstyle{remark} to \string\theoremstyle{definition}}{}%
+            }%
+        \let\th@remark\undefined
+        \renewcommand{\theoremstyle}[1]{%
+            \@ifundefined{th@##1}%
+                {%
+                    \thm@style{plain}%
+                    \@ifundefined{th@##1@changeto}%
+                        {\PackageError{amsthm}{Unknown theoremstyle `##1'}{}}%
+                        {\csname th@##1@changeto\endcsname}%
+                }%
+                {%
+                    \thm@style{##1}%
+                }%
+            }%
     \fi
     }
 %
@@ -4545,7 +4688,7 @@
         {%
             \vskip0.5\baselineskip
             \small
-            {\noindent\normalfont\sffamily\bfseries\acknowledgementsname}\par
+            {\noindent\normalfont\sffamily\bfseries #1}\par
             \begingroup\parindent 0pt\parskip 0.5\baselineskip
         }%
         {\endgroup}
@@ -5019,6 +5162,7 @@
 %
 % appendix
 %
+\def\@appsectionstar@hook{}
 \if@imslayout
     %
     % appendix mess up everything in this layout:
@@ -5042,7 +5186,8 @@
         \else
             \specialsection*{\appendixname: #1}%
         \fi
-        \setcounter{section}{1}%
+        \stepcounter{section}%
+        \@appsectionstar@hook
         }
     %
     % \section{} -> APPENDIX A
@@ -5074,7 +5219,8 @@
     %
     \def\@appsectionstar*#1{%
         \old@section*{#1}%
-        \setcounter{section}{1}%
+        \stepcounter{section}%
+        \@appsectionstar@hook
         }
     %
     \def\@appsectionnostar#1{%
@@ -5084,6 +5230,11 @@
             \def\section@numbersep{:}\old@section{#1}%
         \fi
         }
+\fi
+\if@bjlayout
+    \if@imsart@seceqn
+        \def\@appsectionstar@hook{\setcounter{equation}{0}}
+    \fi
 \fi
 %
 % supplement
@@ -5295,7 +5446,10 @@
         \definecolor{imsgray}{gray}{0.5}%
         }%
     %
-    \overfullrule5\p@
+    \if@ejs@ps@ss@layout
+    \else
+        \overfullrule=5\p@
+    \fi
     \setpkgattr{showframe}{rulecolor}{imsgray}
     \setpkgattr{showframe}{rulewidth}{.05pt}
     %
@@ -5312,14 +5466,12 @@
     \def\set@showframe@box{%
         \global\setbox\showframe@box\vbox to\z@{{%
             \offinterlineskip
-            \normalcolor
             \vbox to \z@{\vss\textcolor{\showframe@rulecolor}{\hrule height\showframe@rulewidth width\textwidth}}%
             \vskip \headheight
             \vbox to \z@{\vss\textcolor{\showframe@rulecolor}{\hrule height\showframe@rulewidth width\textwidth}}%
             \vskip \headsep
             \vbox to \z@{\vss\textcolor{\showframe@rulecolor}{\hrule height\showframe@rulewidth width\textwidth}}%
-            \hbox to \textwidth%
-            {%
+            \hbox to \textwidth{%
                 \llap{\textcolor{\showframe@rulecolor}{\vrule height\textheight width\showframe@rulewidth}}%
                 \hfil\textcolor{\showframe@rulecolor}{\vrule height\textheight width\showframe@rulewidth}%
             }%
