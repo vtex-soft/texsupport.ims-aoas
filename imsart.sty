@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2025/03/31}
+\def\imsfmt@version{2025/07/23}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -172,6 +172,9 @@
 % for new thanksref syntax
 \newif\if@updated@thanksref \@updated@thanksreffalse
 %
+% error message if xr or xr-hyper packages are loaded
+\newif\if@load@xr@or@xr@hyper \@load@xr@or@xr@hyperfalse
+%
 % Information about journals
 %
 \def\set@generic{\def\@tempa{-generic}}
@@ -220,8 +223,8 @@
     \@print@bid@doitrue
     \@imsart@showframetrue
     }
-\newif\if@ejsn@layout \@ejsn@layoutfalse
-\DeclareOption{ejsn}{%
+\newif\if@ejsvtwo@layout \@ejsvtwo@layoutfalse
+\DeclareOption{ejsv2}{%
     \def\journal@id{-ejs}%
     \def\journal@name{Electronic Journal of Statistics }%
     \def\journal@issn{ISSN: 1935-7524}%
@@ -229,7 +232,7 @@
     \@ejs@ps@ss@layouttrue
     \@print@bid@doitrue
     \@imsart@showframetrue
-    \@ejsn@layouttrue
+    \@ejsvtwo@layouttrue
     }
 %
 % Options for the IMS journals:
@@ -242,13 +245,14 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
-    \@load@amsthmtrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@imslayouttrue
     \@autosecdottrue
     \@print@bid@doitrue
     \@updated@thanksreftrue
+    \@load@amsthmtrue
+    \@load@xr@or@xr@hypertrue
     }
 %
 \DeclareOption{aop}{%
@@ -259,13 +263,14 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
-    \@load@amsthmtrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@imslayouttrue
     \@autosecdottrue
     \@print@bid@doitrue
     \@updated@thanksreftrue
+    \@load@amsthmtrue
+    \@load@xr@or@xr@hypertrue
     }
 %
 \DeclareOption{aos}{%
@@ -276,13 +281,14 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
-    \@load@amsthmtrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@imslayouttrue
     \@autosecdottrue
     \@print@bid@doitrue
     \@updated@thanksreftrue
+    \@load@amsthmtrue
+    \@load@xr@or@xr@hypertrue
     }
 %
 \DeclareOption{aoas}{%
@@ -293,13 +299,14 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
-    \@load@amsthmtrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@imslayouttrue
     \@autosecdottrue
     \@print@bid@doitrue
     \@updated@thanksreftrue
+    \@load@amsthmtrue
+    \@load@xr@or@xr@hypertrue
     \AtBeginDocument{%
         \@ifpackagewith{natbib}{numbers}{%
             \@latex@error{Only author-year citations are allowed!
@@ -316,10 +323,11 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
-    \@load@amsthmtrue
     \@stslayouttrue
     \@twocolumntrue
     \@print@bid@doitrue
+    \@load@amsthmtrue
+    \@load@xr@or@xr@hypertrue
     \AtEndPreamble{\if@twocolumn\set@page@layout{528.62625pt}{702.75pt}\fi}%
     }
 %
@@ -338,6 +346,7 @@
     \@load@amsmathtrue
     \@load@natbibtrue
     \@imsart@showframetrue
+    \@load@xr@or@xr@hypertrue
     }
 %
 \DeclareOption{aihp}{%
@@ -349,10 +358,11 @@
     \@twosidetrue
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
-    \@load@amsthmtrue
     \@aihplayouttrue
     \@updated@thanksreftrue
     \@print@bid@doitrue
+    \@load@amsthmtrue
+    \@load@xr@or@xr@hypertrue
     \AtBeginDocument{%
         \@ifpackagewith{natbib}{authoryear}{%
             \@latex@error{Only numerical citations are allowed!
@@ -367,12 +377,13 @@
     \def\journal@url{https://imstat.org/journals-and-publications/brazilian-journal-of-probability-and-statistics/}%
     \set@page@layout{405pt}{646pt}%
     \@twosidetrue
-    \@load@amsthmtrue
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@bjpslayouttrue
     \@updated@thanksreftrue
     \@print@bid@doitrue
+    \@load@amsthmtrue
+    \@load@xr@or@xr@hypertrue
     \AtBeginDocument{%
         \@ifpackagewith{natbib}{numbers}{%
             \@latex@error{Only author-year citations are allowed!
@@ -1837,6 +1848,9 @@
         }%
     }
 \setpkgattr{copyright}{owner}{$\copyright$~\@copyrightyear \copyrightowner@text}
+\ifdefined\HCode
+    \def\copyright@owner@prefix{Copyright }
+\fi
 \setpkgattr{author}{prefix}{}
 \setpkgattr{keyword}{postfix}{\unskip.}
 %
@@ -2593,11 +2607,60 @@
     \def\frenchspacing{\sfcode`\.1006\sfcode`\?1005\sfcode`\!1004%
         \sfcode`\:1003\sfcode`\;1002\sfcode`\,1001 }%
     }
+% set newtx as main font
+\def\set@imsart@newtx{%
+    \csname set@imsart@newtx@hook\endcsname
+    \RequirePackage[T1]{fontenc}%
+    \IfFileExists{nimbusserif.sty}%
+        {%
+            \RequirePackage{nimbusmono}%
+            \RequirePackage[scaled=0.9]{nimbussans}%
+            \ifnum\jobstart@date@info>20250531
+                \ifdefined\HCode
+                \else
+                    \RequirePackage{nimbusserif}%
+                    \AtEndOfClass{%
+                        \DeclareFontShape{T1}{NimbusSerif}{m}{sc}{<-> utmrc8t}{}%
+                        \DeclareFontShape{T1}{NimbusSerif}{b}{sc}{<-> utmbc8t}{}%
+                        \DeclareFontShape{T1}{NimbusSerif}{bx}{sc}{<->ssub * NimbusSerif/b/sc}{}%
+                        }%
+                \fi
+            \else
+                \def\rmdefault{utm}%
+                \def\familydefault{\rmdefault}%
+            \fi
+        }%
+        {%
+            \PackageWarning{imsart}{nimbusserif package isn't available, 
+                falling back to default Times Roman equivalent font}%
+            \RequirePackage{times,courier}%
+            \RequirePackage[scaled=.9]{helvet}%
+        }%
+    \RequirePackage{textcomp}%
+    \ifdefined\HCode
+        \RequirePackage{amsthm,amsmath}%
+    \else
+        \IfFileExists{newtxmath.sty}%
+            {%
+                \ifdefined\DocumentMetadata% >=2022
+                    \RequirePackage[amsthm]{newtxmath}%
+                \else
+                    \RequirePackage{amsthm}%
+                    \RequirePackage{newtxmath}%
+                \fi 
+            }%
+            {%
+                \PackageWarning{imsart}{newtxmath package isn't available, 
+                    amsmath and mathptmx are used instead}%
+                \RequirePackage{amsthm,amsmath,mathptmx}%
+            }%
+    \fi
+    }
 % Set up parameters for the EJS, PS, SS layout:
 \if@ejs@ps@ss@layout
     \RequirePackage{lmodern}
     \usepackage[T1]{fontenc}
-    \UseLegacyTextSymbols% for text bullets, etc.
+    \csname UseLegacyTextSymbols\endcsname% for text bullets, etc.
     \AtEndOfPackage{%
         \ifcsundef{do@not@scale@lmex}%
             {% make lmex10 scalable
@@ -2609,32 +2672,14 @@
             {}%
         }%
 \fi
-\if@ejsn@layout
+\if@ejsvtwo@layout
     \def\@xipt{11}
     \def\@xivpt{14}
     \def\@xvipt{16}
     \def\@xviiipt{18}
     \def\@xxpt{20}
     \def\@xxivpt{24}
-    \IfFileExists{newtxmath.sty}%
-        {\edef\new@tx@math@sty@exists{1}}%
-        {}
-    \RequirePackage[T1]{fontenc}
-    \def\rmdefault{utm}
-    \RequirePackage{nimbusmono}
-    \RequirePackage[scaled=0.9]{nimbussans}
-    \RequirePackage{textcomp}
-    \ifdefined\HCode
-    \else
-        \ifdefined\new@tx@math@sty@exists
-            \RequirePackage[amsthm]{newtxmath}
-        \else
-            \PackageWarning{imsart}{newtxmath package isn't available, 
-                amsmath is used instead}%
-            \RequirePackage{amsmath}
-        \fi
-    \fi
-    \let\openbox\relax
+    \set@imsart@newtx
     \declaremathsizes@as@in@mathtime
     \renewcommand\normalsize{%
         \@setfontsize\normalsize\@xipt{14\p@ plus .5\p@ minus .5\p@}%
@@ -2669,8 +2714,8 @@
     %
     \setlength{\paperwidth}{6.75in}
     \setlength{\paperheight}{10in}
-    \set@page@layout{405bp}{646bp}
-    \advance\topmargin by 3.5\p@
+    \set@page@layout{405bp}{626pt}% 45 lines
+    \advance\topmargin by -7.5\p@
     \ifpdf
         \ifdefined\pdfpagewidth
             \pdfpagewidth=\paperwidth
@@ -3473,34 +3518,16 @@
 % Set up parameters for the BJ journal layout:
 %
 \if@bjlayout
-    \IfFileExists{newtxmath.sty}%
-        {\edef\new@tx@math@sty@exists{1}}%
-        {}
-    \RequirePackage[T1]{fontenc}
-    \def\rmdefault{utm}
-    \ifnum\jobstart@date@info>20250210
-        \RequirePackage{nimbusmono}
-        \RequirePackage[scaled=0.9]{nimbussans}
-    \else
-        \ifdefined\new@tx@math@sty@exists
-            \def\ttdefault{ucr}
-        \else
-            \def\ttdefault{pcr}% ucr in old systems are somewhat buggy
-        \fi
-        \RequirePackage[scaled=0.9]{helvet}
-    \fi
-    \RequirePackage{textcomp}
-    \ifdefined\HCode
-    \else
-        \ifdefined\new@tx@math@sty@exists
-            \RequirePackage{newtxmath}
-        \else
-            \PackageWarning{imsart}{newtxmath package isn't available, 
-                amsmath is used instead}%
-            \RequirePackage{amsmath}
-        \fi
-    \fi
-    \let\openbox\relax
+    \set@imsart@newtx
+    \def\orig@amsthm@openbox{%
+        \leavevmode
+        \hbox to.77778em{%
+            \hfil\vrule
+            \vbox to.675em{\hrule width.6em\vfil\hrule}%
+            \vrule\hfil
+            }%
+        }
+    \let\openbox\orig@amsthm@openbox
     \RequirePackage{graphicx}%
     \RequirePackage{letterspace}%
     \def\setlstracking#1{\csdef{MT@letterspace}{#1}}%
@@ -3578,7 +3605,7 @@
         \belowdisplayskip=\abovedisplayskip
         \belowdisplayshortskip=\abovedisplayshortskip
         }
-    \normalsize
+    \normalfont\normalsize
     \renewcommand\small{%
         \@setfontsize\small\@ixpt{11\p@ plus .2\p@ minus .2\p@}%
         \abovedisplayskip=7.5\p@ \@plus4\p@ \@minus1\p@
@@ -4604,8 +4631,6 @@
                 {.}%
                 {.5em}%
                 {}%
-        \else
-            \let\th@definition\th@remark
         \fi
     \fi
     \ifnum\ims@thmshape>\z@
@@ -5486,6 +5511,30 @@
     %
     \AtBeginDocument{\set@showframe@box}
     %
+\fi
+%
+\if@load@xr@or@xr@hyper
+    \def\@load@xr@or@xr@hyper@error@message@text{%
+        Please do not use the 'xr' or 'xr-hyper' package.^^J%
+        External references are not supported in our workflow.^^J%
+        Replace all references to external documents with plain text%
+        }
+    \AtBeginDocument{%
+        \@ifpackageloaded{xr}%
+            {%
+                \@latex@error{%
+                    \@load@xr@or@xr@hyper@error@message@text
+                    }{}%
+            }%
+            {}%
+        \@ifpackageloaded{xr-hyper}%
+            {%
+                \@latex@error{%
+                    \@load@xr@or@xr@hyper@error@message@text
+                    }{}%
+            }%
+            {}%
+        }
 \fi
 %
 % INITIALIZATION
