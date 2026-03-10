@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2025/07/23}
+\def\imsfmt@version{2026/03/10}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -253,6 +253,7 @@
     \@updated@thanksreftrue
     \@load@amsthmtrue
     \@load@xr@or@xr@hypertrue
+    \@author@sep@by@numbertrue
     }
 %
 \DeclareOption{aop}{%
@@ -271,6 +272,7 @@
     \@updated@thanksreftrue
     \@load@amsthmtrue
     \@load@xr@or@xr@hypertrue
+    \@author@sep@by@numbertrue
     }
 %
 \DeclareOption{aos}{%
@@ -289,6 +291,7 @@
     \@updated@thanksreftrue
     \@load@amsthmtrue
     \@load@xr@or@xr@hypertrue
+    \@author@sep@by@numbertrue
     }
 %
 \DeclareOption{aoas}{%
@@ -307,6 +310,7 @@
     \@updated@thanksreftrue
     \@load@amsthmtrue
     \@load@xr@or@xr@hypertrue
+    \@author@sep@by@numbertrue
     \AtBeginDocument{%
         \@ifpackagewith{natbib}{numbers}{%
             \@latex@error{Only author-year citations are allowed!
@@ -324,10 +328,12 @@
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
     \@stslayouttrue
+    \@autosecdottrue
     \@twocolumntrue
     \@print@bid@doitrue
     \@load@amsthmtrue
     \@load@xr@or@xr@hypertrue
+    \@author@sep@by@numbertrue
     \AtEndPreamble{\if@twocolumn\set@page@layout{528.62625pt}{702.75pt}\fi}%
     }
 %
@@ -347,6 +353,7 @@
     \@load@natbibtrue
     \@imsart@showframetrue
     \@load@xr@or@xr@hypertrue
+    \@author@sep@by@numbertrue
     }
 %
 \DeclareOption{aihp}{%
@@ -359,10 +366,12 @@
     \input{leqno.clo}% formula numbers at left
     \@amsmath@leqnotrue
     \@aihplayouttrue
+    \@autosecdottrue
     \@updated@thanksreftrue
     \@print@bid@doitrue
     \@load@amsthmtrue
     \@load@xr@or@xr@hypertrue
+    \@author@sep@by@numbertrue
     \AtBeginDocument{%
         \@ifpackagewith{natbib}{authoryear}{%
             \@latex@error{Only numerical citations are allowed!
@@ -380,10 +389,12 @@
     \@historyasfootnotetrue
     \@keywordsasfootnotetrue
     \@bjpslayouttrue
+    \@autosecdottrue
     \@updated@thanksreftrue
     \@print@bid@doitrue
     \@load@amsthmtrue
     \@load@xr@or@xr@hypertrue
+    \@author@sep@by@numbertrue
     \AtBeginDocument{%
         \@ifpackagewith{natbib}{numbers}{%
             \@latex@error{Only author-year citations are allowed!
@@ -472,6 +483,8 @@
 \DeclareOption{preprint}{%
     \imsart@preprint@settings
     }
+%
+\newif\if@author@sep@by@number \@author@sep@by@numberfalse
 %
 % Initiate some info:
 \def\journal@name{}
@@ -3021,6 +3034,13 @@
         \belowdisplayskip=\abovedisplayskip
         }
     \flushbottom
+    \ifnum\jobstart@date@info>20250903\relax
+        \AtBeginDocument{%
+            \ifdefined\noaccents@
+                \noaccents@
+            \fi
+            }
+    \fi
     %
 \fi % end if@balayout
 %
@@ -3273,6 +3293,10 @@
             \@ifnonempty{\@copyrightyear\@volume\@issue\@pagerange\break}\doi@text
             }
     \fi
+    %
+    \setpkgattr{keyword}{MSC}{\ims@href{\msc@url}{MSC2020 subject classifications}.}
+    \setpkgattr{keyword}{MSC2020}{\ims@href{\msc@url}{MSC2020 subject classifications}.}
+    \setpkgattr{keyword}{KWD}{Keywords and phrases.}
     %
     \def\volume#1{\gdef\@volume{Vol. #1, }}
     \def\issue#1{\gdef\@issue{No. #1, }}
@@ -3701,21 +3725,6 @@
         \tableofcontents@fmt
         }
     %
-    \AtBeginDocument{%
-        \def\author@sep@by@number#1{%
-            \@tempcntb=\author@num
-            \advance\@tempcntb by \m@ne
-            \ifnum#1=\@tempcntb
-                \unskip\unkern\ \and
-            \else
-                \ifnum#1=\author@num
-                \else
-                    \unskip\unkern,
-                \fi
-            \fi
-            \ignorespaces
-            }%
-        }
     % invoke \printhistory at end of document:
     \let\old@enddocument\enddocument
     \def\enddocument{\history@fmt\old@enddocument}
@@ -3884,6 +3893,7 @@
     \setpkgattr{keywordname}{size}{\itshape}
     \setpkgattr{thebibliography}{size}{\footnotesize}
     \let\inits@size\@gobble
+    \setcounter{secnumdepth}{5}
     \setcounter{tocdepth}{6}
     %
     \def\put@fmt@data{%
@@ -3897,8 +3907,9 @@
         \tableofcontents@fmt
         }
     %
+    \def\sep{\unskip\string; }
     \setpkgattr{keyword}{KWD}{Keywords:}
-    \setpkgattr{keyword}{MSC2010}{MSC:}
+    \setpkgattr{keyword}{MSC}{\ims@href{\msc@url}{MSC2020 subject classifications}:}
     \setpkgattr{keyword}{postfix}{\unskip}
     \setpkgattr{email}{text}{}
     \setpkgattr{url}{text}{}
@@ -4054,6 +4065,7 @@
     \setpkgattr{email}{text}{}
     \setpkgattr{url}{text}{}
     \setpkgattr{fullurl}{text}{}
+    \setcounter{secnumdepth}{5}
     \setcounter{tocdepth}{6}
     \def\thethanks{\@arabic\c@thanks}
     %
@@ -4680,6 +4692,20 @@
         \def\binom#1#2{\begin{pmatrix} #1 \cr #2\end{pmatrix}}
         \def\set@pre@matrix@hook{\def\pre@matrix@hook{\everymath={\displaystyle}}}
         \everydisplay=\expandafter{\the\everydisplay\set@pre@matrix@hook}%
+    \fi
+\fi
+\ifnum\jobstart@date@info>20250824\relax
+    \ifdefined\noaccents@
+        \noaccents@
+    \fi
+\fi
+\ifnum\jobstart@date@info>20250903\relax
+    \if@ejs@ps@ss@layout
+        \AtBeginDocument{%
+            \ifdefined\noaccents@
+                \noaccents@
+            \fi
+            }
     \fi
 \fi
 %
@@ -5534,6 +5560,24 @@
                     }{}%
             }%
             {}%
+        }
+\fi
+%
+\if@author@sep@by@number
+    \AtBeginDocument{%
+        \def\author@sep@by@number#1{%
+            \@tempcntb=\author@num
+            \advance\@tempcntb by \m@ne
+            \ifnum#1=\@tempcntb
+                \unskip\unkern\ \and
+            \else
+                \ifnum#1=\author@num
+                \else
+                    \unskip\unkern,
+                \fi
+            \fi
+            \ignorespaces
+            }%
         }
 \fi
 %
