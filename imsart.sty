@@ -65,7 +65,7 @@
 % Requires Latex2e, ver.2000.06
 %
 \def\imsfmt@name{imsart}
-\def\imsfmt@version{2026/03/10}
+\def\imsfmt@version{2026/09/11}
 %
 \ProvidesFile{imsart.sty}[\imsfmt@version\space IMS article style]
 %
@@ -146,19 +146,19 @@
 %
 \newif\if@imsart@numbers
 \newif\if@imsart@authoryear
-\newif\if@imsart@nameyear
+\newif\if@nameyear
 \DeclareOption{numbers}{%
     \@imsart@numberstrue
     \PassOptionsToPackage{numbers}{natbib}%
     }
 \DeclareOption{nameyear}{%
     \PassOptionsToPackage{authoryear}{natbib}%
-    \@imsart@nameyeartrue
+    \@nameyeartrue
     \@imsart@authoryeartrue
     }
 \DeclareOption{authoryear}{%
     \PassOptionsToPackage{authoryear}{natbib}%
-    \@imsart@nameyeartrue
+    \@nameyeartrue
     \@imsart@authoryeartrue
     }
 %
@@ -569,7 +569,7 @@
 \fi
 %
 \if@bjlayout
-    \if@imsart@nameyear
+    \if@nameyear
     \else
         \PassOptionsToPackage{sort&compress}{natbib}%
     \fi
@@ -2347,6 +2347,25 @@
 % \keyword@class -> KWD
 % \keyword@KWD -> AMS 2000...
 %
+\ifnum\jobstart@date@info>20260428\relax
+    \setpkgattr{kwdgroup}{primary}{%
+        \let\kwd@sep\relax
+        \unskip Primary\ 
+        }
+    \setpkgattr{kwdgroup}{secondary}{%
+        \let\kwd@sep\relax
+        \unskip; secondary\ 
+        }
+    \define@key{kwdgroup}{type}{\edef\kwdgroup@@type{#1}}
+    \def\kwdgroup{\@ifnextchar[{\@kwdgroup}{\@kwdgroup[]}}
+    \def\@kwdgroup[#1]#2{%
+        \setkeys{kwdgroup}{#1}%
+        \csname kwdgroup@\kwdgroup@@type\endcsname
+        \ignorespaces
+        #2%
+        }
+\fi
+%
 \gdef\keyword{\@ifnextchar[{\@keyword}{\@keyword[class=KWD]}}
 %
 \gdef\@keyword[#1]{%
@@ -2385,12 +2404,21 @@
 % \kwd[; ]{foo}
 \def\sep{\unskip\string, }
 %
-\DeclareRobustCommand*\kwd{\@ifnextchar[\@kwd{\@kwd[\kwd@sep]}}
-\def\@kwd[#1]#2{%
-    \unskip#1{#2}%
-    \addto@keywords@list{#2}%
-    \let\kwd@sep\sep
-    }
+\ifnum\jobstart@date@info>20260428\relax
+    \DeclareRobustCommand*\kwd[1]{%
+        \kwd@sep #1%
+        \addto@keywords@list{#1}%
+        \let\kwd@sep\sep
+        \ignorespaces
+        }
+\else
+    \DeclareRobustCommand*\kwd{\@ifnextchar[\@kwd{\@kwd[\kwd@sep]}}
+    \def\@kwd[#1]#2{%
+        \unskip#1{#2}%
+        \addto@keywords@list{#2}%
+        \let\kwd@sep\sep
+        }
+\fi
 %
 % \maketitle
 % if \frontmatter is not used, we will redefine \maketitle
@@ -2932,7 +2960,10 @@
             }%
         \setpkgattr{email}{text}{}%
         %
-        \appto\set@natbib{\setlength\bibsep{6pt}}%
+        \ifnum\jobstart@date@info>20260326\relax
+        \else
+            \appto\set@natbib{\setlength\bibsep{6pt}}%
+        \fi
         %
         \csdef{copyrightowner@text}{International Society for Bayesian Analysis}%
         \def\journal@issn{$\copyright$~\ims@href{https://www.imstat.org}{\copyrightowner@text}, 
@@ -3041,7 +3072,91 @@
             \fi
             }
     \fi
+    \ifnum\jobstart@date@info>20260326\relax
+        \setpkgattr{thebibliography}{size}{\small}
+    \fi
     %
+    \AtBeginDocument{%
+        \@ifundefined{urlstyle}{}{\urlstyle{rm}}%
+        \def\set@bibl@cmd#1{%
+            \expandafter\let\csname #1\endcsname\@firstofone
+            }%
+        \let\barticle\@undefined
+        \let\bbook\@undefined
+        \let\bchapter\@undefined
+        \let\botherref\@undefined
+        \def\set@bibl@env#1{%
+            \newenvironment{#1}%
+                {%
+                    \csname start@bibenv@hook\endcsname
+                    \csname start@#1@hook\endcsname
+                }{%
+                    \ifnum\jobstart@date@info>20161206\relax
+                        \unskip
+                    \fi
+                    \csname stop@#1@hook\endcsname
+                    \csname stop@bibenv@hook\endcsname
+                    \nolinebreak
+                }%
+            }%
+        %
+        \def\bibl@cmds@I{%
+            bvolume,binits,bsnm,bparticle,bsuffix,bdegs,%
+            bsertitle,batitle,bjtitle,bctitle,bbtitle,bauthor,%
+            binstitute,binstitutionaled,bissue,bnumber,bmonth,bedition,bpublisher,blocation,%
+            bisbn,bissn,bfpage,blpage,byear,bcomment,bsupplement,%
+            beditor,bseriesno,bconfname,bconflocation,bconfdate,%
+            oauthor,oinstitute%
+            }%
+        \def\do#1{\set@bibl@cmd{#1}}%
+        \expandafter\docsvlist\expandafter{\bibl@cmds@I}%
+        \def\betal{et al.}%
+        %
+        \def\bibl@envs{barticle,bchapter,botherref,bbook,breport,bthesis,bpatent}%
+        \def\do#1{\set@bibl@env{#1}}%
+        \expandafter\docsvlist\expandafter{\bibl@envs}%
+        %
+        \let\bid@start\@empty
+        \let\bid@end\@empty
+        %
+        \def\MR@url{http://mathscinet.ams.org/mathscinet-getitem?mr=}%
+        \def\MR#1{\href{\MR@url#1}{MR#1}}%
+        \def\DOI@url{https://doi.org/}%
+        \@ifundefined{BDOI}%
+            {%
+                \def\BDOI#1{%
+                    \href{\DOI@url#1}{doi:#1}%
+                    }%
+            }{}%
+        %
+        \appto\bid@end{\unskip.}%
+        %
+        \define@key{bid}{mr}{\def\bid@mr{\MR{#1}}}%
+        \define@key{bid}{doi}{\def\bid@doi{\BDOI{#1}}}%
+        \ifnum\jobstart@date@info>20260803\relax
+            \def\bid#1{%
+                \bgroup
+                    \bid@start
+                    \let\bid@output\@empty
+                    \setkeys{bid}{#1}\ignorespaces
+                    % Output sequence: <MR>. <DOI>
+                    \ifdefvoid\bid@doi
+                        {%
+                            \ifdefvoid\bid@mr
+                                {}%
+                                {%
+                                    \ifdefempty\bid@output
+                                        {\let\bid@output\bid@mr}%
+                                        {}%
+                                }%
+                        }%
+                        {\let\bid@output\bid@doi}%
+                    \bid@output
+                    \bid@end
+                \egroup
+                }%
+        \fi
+        }%
 \fi % end if@balayout
 %
 % Set up parameters for the IMS journals (AOP, AAP, AOS) layout:
@@ -4987,8 +5102,13 @@
     \def\AND{and }%
     \let\betal\@firstofone
     \set@bibl@cmd{btitle}%
+    \set@bibl@cmd{binstitute}%
+    \set@bibl@cmd{binstitutionaled}%
+    \set@bibl@cmd{bcomment}%
     \let\byear\@firstofone
     \let\bpages\@firstofone
+    \let\bfpage\@firstofone
+    \let\blpage\@firstofone
     \let\bmisc\@firstofone
     \let\bnote\@firstofone
     \let\banumber\@firstofone
@@ -5006,6 +5126,8 @@
 %
 \setpkgattr{bauthor}{style}{\scshape}
 \setpkgattr{beditor}{style}{\scshape}
+\setpkgattr{binstitute}{style}{\scshape}
+\setpkgattr{binstitutionaled}{style}{\scshape}
 %
 \setpkgattr{bjournal}{style}{\itshape}
 \setpkgattr{bbooktitle}{style}{\itshape}
@@ -5021,6 +5143,9 @@
     \common@pub@types
     \let\bauthor\bbl@bauthor
     \set@bibl@cmd{bjournal}%
+    \set@bibl@cmd{bjtitle}%
+    \set@bibl@cmd{batitle}%
+    \let\bjtitle@style\itshape
     }
 %
 % bbook
@@ -5032,6 +5157,8 @@
     \let\bauthor\bbl@bauthor
     \let\beditor\bbl@beditor
     \let\bedition\@firstofone
+    \set@bibl@cmd{bbtitle}%
+    \set@bibl@cmd{bsertitle}%
     \set@bibl@cmd{bseries}%
     \let\bpublisher\@firstofone
     \let\baddress\@firstofone
@@ -5039,6 +5166,8 @@
     \let\bisbn\@gobble
     %
     \let\btitle@style\itshape
+    \let\bbtitle@style\itshape
+    \let\bsertitle@style\itshape
     }
 %
 % bincollection
@@ -5095,6 +5224,24 @@
     \let\bisbn\@gobble
     %
     \let\btitle@style\itshape
+    }
+%
+% bchapter
+%
+\def\bchapter{%
+    \common@pub@types
+    \let\bauthor\bbl@bauthor
+    \let\beditor\bbl@beditor
+    \let\bedition\@firstofone
+    \set@bibl@cmd{bctitle}%
+    \set@bibl@cmd{bbtitle}%
+    \set@bibl@cmd{bsertitle}%
+    \let\bpublisher\@firstofone
+    \let\blocation\@firstofone
+    %
+    \let\bbtitle@style\itshape
+    \let\bsertitle@style\itshape
+    \let\beditor@style\relax
     }
 %
 % bproceedings
@@ -5203,6 +5350,13 @@
     \common@pub@types
     \let\bauthor\bbl@bauthor
     \let\bhowpublished\@firstofone
+    }
+%
+% botherref
+%
+\def\botherref{%
+    \common@pub@types
+    \let\oauthor\bbl@bauthor
     }
 %
 % \bptok
@@ -5539,13 +5693,13 @@
     %
 \fi
 %
-\if@load@xr@or@xr@hyper
-    \def\@load@xr@or@xr@hyper@error@message@text{%
-        Please do not use the 'xr' or 'xr-hyper' package.^^J%
-        External references are not supported in our workflow.^^J%
-        Replace all references to external documents with plain text%
-        }
-    \AtBeginDocument{%
+\def\@load@xr@or@xr@hyper@error@message@text{%
+    Please do not use the 'xr' or 'xr-hyper' package.^^J%
+    External references are not supported in our workflow.^^J%
+    Replace all references to external documents with plain text%
+    }
+\AtBeginDocument{%
+    \if@load@xr@or@xr@hyper
         \@ifpackageloaded{xr}%
             {%
                 \@latex@error{%
@@ -5560,8 +5714,8 @@
                     }{}%
             }%
             {}%
-        }
-\fi
+    \fi
+    }
 %
 \if@author@sep@by@number
     \AtBeginDocument{%
